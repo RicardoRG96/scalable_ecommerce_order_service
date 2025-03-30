@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ricardo.scalable.ecommerce.platform.order_service.entities.OrderItem;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderItemDto;
 
 public interface OrderItemService {
 
@@ -22,9 +23,9 @@ public interface OrderItemService {
 
     List<OrderItem> findAll();
 
-    Optional<OrderItem> save(OrderItem orderItem);
+    Optional<OrderItem> save(OrderItemDto orderItem);
 
-    Optional<OrderItem> update(OrderItem orderItem);
+    Optional<OrderItem> update(Long id, OrderItemDto orderItem);
 
     void delete(Long id);
 
