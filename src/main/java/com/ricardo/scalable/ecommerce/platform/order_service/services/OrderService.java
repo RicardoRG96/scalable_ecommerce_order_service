@@ -1,13 +1,13 @@
-package com.ricardo.scalable.ecommerce.platform.order_service.repositories;
+package com.ricardo.scalable.ecommerce.platform.order_service.services;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
-
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 
-public interface OrderRepository extends CrudRepository<Order, Long> {
+public interface OrderService {
+
+    Optional<Order> findById(Long id);
 
     Optional<List<Order>> findByUserId(Long userId);
 
@@ -20,5 +20,11 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
     Optional<List<Order>> findByShippingAddressId(Long shippingAddressId);
 
     Optional<List<Order>> findByBillingAddressId(Long billingAddressId);
+
+    Optional<Order> save(Order order);
+
+    Optional<Order> update(Order order);
+
+    void delete(Long id);
 
 }
