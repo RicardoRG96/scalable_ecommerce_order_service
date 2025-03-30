@@ -21,6 +21,8 @@ public interface OrderService {
 
     Optional<List<Order>> findByBillingAddressId(Long billingAddressId);
 
+    List<Order> findAll();
+
     Optional<Order> save(Order order);
 
     Optional<Order> update(Order order);
