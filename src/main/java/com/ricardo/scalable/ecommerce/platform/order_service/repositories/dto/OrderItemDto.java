@@ -2,16 +2,27 @@ package com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 public class OrderItemDto {
 
+    @NotNull
+    @Min(1)
     private Long OrderId;
 
+    @NotNull
+    @Min(1)
     private Long productSkuId;
 
+    @Min(1)
     private int quantity;
 
+    @NotNull
     private BigDecimal unitPrice;
 
+    @NotNull
+    @Min(1)
     private Long discountId;
 
     public OrderItemDto() {

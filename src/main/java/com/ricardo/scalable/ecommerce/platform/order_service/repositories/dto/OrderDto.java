@@ -2,18 +2,31 @@ package com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class OrderDto {
 
+    @NotNull
+    @Min(1)
     private Long userId;
 
+    @NotNull
     private BigDecimal totalAmount;
 
+    @NotBlank
     private String orderStatus;
 
+    @NotBlank
     private String paymentStatus;
 
+    @NotNull
+    @Min(1)
     private Long shippingAddressId;
 
+    @NotNull
+    @Min(1)
     private Long billingAddressId;
 
     public OrderDto() {

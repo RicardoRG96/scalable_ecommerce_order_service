@@ -14,6 +14,8 @@ import com.ricardo.scalable.ecommerce.platform.order_service.repositories.Addres
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.UserRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
 
 public class OrderServiceImpl implements OrderService {
 
@@ -111,6 +113,30 @@ public class OrderServiceImpl implements OrderService {
             orderToUpdate.setShippingAddress(shippingAddressOptional.orElseThrow());
             orderToUpdate.setBillingAddress(billingAddressOptional.orElseThrow());
 
+            return Optional.of(orderRepository.save(orderToUpdate));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Order> updateOrderStatus(UpdateOrderStatusDto orderStatus) {
+        Optional<Order> orderOptional = orderRepository.findById(orderStatus.getOrderId());
+
+        if (orderOptional.isPresent()) {
+            Order orderToUpdate = orderOptional.orElseThrow();
+            orderToUpdate.setOrderStatus(OrderStatus.valueOf(orderStatus.getOrderStatus()));
+            return Optional.of(orderRepository.save(orderToUpdate));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Order> updatePaymentStatus(UpdatePaymentStatusDto paymentStatus) {
+        Optional<Order> orderOptional = orderRepository.findById(paymentStatus.getOrderId());
+
+        if (orderOptional.isPresent()) {
+            Order orderToUpdate = orderOptional.orElseThrow();
+            orderToUpdate.setPaymentStatus(PaymentStatus.valueOf(paymentStatus.getPaymentStatus()));
             return Optional.of(orderRepository.save(orderToUpdate));
         }
         return Optional.empty();
