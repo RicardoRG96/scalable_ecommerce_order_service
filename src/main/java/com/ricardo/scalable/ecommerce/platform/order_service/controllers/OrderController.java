@@ -131,8 +131,8 @@ public class OrderController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOrder(
         @Valid @RequestBody OrderDto order,
-        BindingResult result,
-        @PathVariable Long id
+        @PathVariable Long id,
+        BindingResult result
     ) {
         if (result.hasErrors()) {
             return validation(result);

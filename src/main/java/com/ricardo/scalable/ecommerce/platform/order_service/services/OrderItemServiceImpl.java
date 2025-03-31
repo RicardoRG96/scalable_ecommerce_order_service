@@ -51,7 +51,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    public Optional<List<OrderItem>> findByUnitePrice(BigDecimal unitPrice) {
+    public Optional<List<OrderItem>> findByUnitPrice(BigDecimal unitPrice) {
         return orderItemRepository.findByUnitPrice(unitPrice);
     }
 

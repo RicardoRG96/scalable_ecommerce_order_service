@@ -17,7 +17,7 @@ public interface OrderItemService {
 
     Optional<OrderItem> findByOrderIdAndProductSkuId(Long orderId, Long productSkuId);
 
-    Optional<List<OrderItem>> findByUnitePrice(BigDecimal unitPrice);
+    Optional<List<OrderItem>> findByUnitPrice(BigDecimal unitPrice);
 
     Optional<List<OrderItem>> findByDiscountId(Long discountId);
 
