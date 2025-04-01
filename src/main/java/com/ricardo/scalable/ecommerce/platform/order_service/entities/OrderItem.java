@@ -44,7 +44,9 @@ public class OrderItem {
     @NotNull
     private BigDecimal unitPrice;
 
-    @Column(name = "discount_id")
+    @ManyToOne
+    @JoinColumn(name = "discount_id")
+    @NotNull
     private Discount discount;
 
     @Column(name = "created_at")

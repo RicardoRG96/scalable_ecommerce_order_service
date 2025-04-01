@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Discount;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
@@ -16,6 +17,7 @@ import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderI
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.ProductSkuRepository;
 
+@Service
 public class OrderItemServiceImpl implements OrderItemService {
 
     @Autowired
@@ -73,8 +75,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         
         if (
             orderOptional.isPresent() && 
-            productSkuOptional.isPresent() &&
-            discountOptional.isPresent()
+            productSkuOptional.isPresent()
         ) {
             Order order = orderOptional.orElseThrow();
             ProductSku productSku = productSkuOptional.orElseThrow();

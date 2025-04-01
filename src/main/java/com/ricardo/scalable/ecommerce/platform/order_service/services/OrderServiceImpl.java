@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Address;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
@@ -17,6 +18,7 @@ import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.Or
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
 
+@Service
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -82,8 +84,8 @@ public class OrderServiceImpl implements OrderService {
             Order createdOrder = new Order();
             createdOrder.setUser(userOptional.orElseThrow());
             createdOrder.setTotalAmount(order.getTotalAmount());
-            createdOrder.setOrderStatus(OrderStatus.valueOf(order.getOrderStatus()));
-            createdOrder.setPaymentStatus(PaymentStatus.valueOf(order.getPaymentStatus()));
+            createdOrder.setOrderStatus(OrderStatus.valueOf(order.getOrderStatus().toUpperCase()));
+            createdOrder.setPaymentStatus(PaymentStatus.valueOf(order.getPaymentStatus().toUpperCase()));
             createdOrder.setShippingAddress(shippingAddressOptional.orElseThrow());
             createdOrder.setBillingAddress(billingAddressOptional.orElseThrow());
 
