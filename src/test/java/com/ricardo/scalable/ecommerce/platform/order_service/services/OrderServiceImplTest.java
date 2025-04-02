@@ -246,4 +246,44 @@ public class OrderServiceImplTest {
 		);
 	}
 
+    @Test
+	void testUpdateOrderStatus() {
+		when(orderRepository.findById(1L)).thenReturn(createOrder001());
+		when(orderRepository.save(any())).thenReturn(createOrderStatusUpdateResponse());
+
+		UpdateOrderStatusDto updateOrderStatusDto = createOrderStatusUpdateRequest();
+		Optional<Order> updatedOrder = orderService.updateOrderStatus(updateOrderStatusDto);
+
+		assertAll(
+			() -> assertTrue(updatedOrder.isPresent()),
+			() -> assertEquals(1L, updatedOrder.orElseThrow().getId()),
+			() -> assertEquals(1L, updatedOrder.orElseThrow().getUser().getId()),
+			() -> assertEquals(1L, updatedOrder.orElseThrow().getShippingAddress().getId()),
+			() -> assertEquals(1L, updatedOrder.orElseThrow().getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("199.99"), updatedOrder.orElseThrow().getTotalAmount()),
+			() -> assertEquals(OrderStatus.valueOf("PAID"), updatedOrder.orElseThrow().getOrderStatus()),
+			() -> assertEquals(PaymentStatus.valueOf("PENDING"), updatedOrder.orElseThrow().getPaymentStatus())
+		);
+	}
+
+	@Test
+	void testUpdatePaymentStatus() {
+		when(orderRepository.findById(1L)).thenReturn(createOrder001());
+		when(orderRepository.save(any())).thenReturn(createPaymentStatusUpdateResponse());
+
+		UpdatePaymentStatusDto updatePaymentStatusDto = createPaymentStatusUpdateRequest();
+		Optional<Order> updatedOrder = orderService.updatePaymentStatus(updatePaymentStatusDto);
+
+		assertAll(
+			() -> assertTrue(updatedOrder.isPresent()),
+			() -> assertEquals(1L, updatedOrder.orElseThrow().getId()),
+			() -> assertEquals(1L, updatedOrder.orElseThrow().getUser().getId()),
+			() -> assertEquals(1L, updatedOrder.orElseThrow().getShippingAddress().getId()),
+			() -> assertEquals(1L, updatedOrder.orElseThrow().getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("199.99"), updatedOrder.orElseThrow().getTotalAmount()),
+			() -> assertEquals(OrderStatus.valueOf("PENDING"), updatedOrder.orElseThrow().getOrderStatus()),
+			() -> assertEquals(PaymentStatus.valueOf("COMPLETED"), updatedOrder.orElseThrow().getPaymentStatus())
+		);
+	}
+
 }
