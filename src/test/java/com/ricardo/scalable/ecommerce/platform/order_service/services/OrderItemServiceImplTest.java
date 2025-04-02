@@ -84,4 +84,45 @@ public class OrderItemServiceImplTest {
 		);
 	}
 
+    @Test
+	void testFindByProductSkuId() {
+		when(orderItemRepository.findByProductSkuId(1L)).thenReturn(createListOfOrderItemByProductSkuId1());
+
+		Optional<List<OrderItem>> orderItems = orderItemService.findByProductSkuId(1L);
+
+		assertAll(
+			() -> assertTrue(orderItems.isPresent()),
+			() -> assertEquals(2, orderItems.orElseThrow().size()),
+			() -> assertEquals(1L, orderItems.orElseThrow().get(0).getId()),
+			() -> assertEquals(1L, orderItems.orElseThrow().get(0).getOrder().getId()),
+			() -> assertEquals(1L, orderItems.orElseThrow().get(0).getProductSku().getId()),
+			() -> assertEquals(1L, orderItems.orElseThrow().get(0).getDiscount().getId()),
+			() -> assertEquals(1, orderItems.orElseThrow().get(0).getQuantity()),
+			() -> assertEquals(new BigDecimal(1000.00), orderItems.orElseThrow().get(0).getUnitPrice()),
+			() -> assertEquals(6L, orderItems.orElseThrow().get(1).getId()),
+			() -> assertEquals(4L, orderItems.orElseThrow().get(1).getOrder().getId()),
+			() -> assertEquals(1L, orderItems.orElseThrow().get(1).getProductSku().getId()),
+			() -> assertNull(orderItems.orElseThrow().get(1).getDiscount()),
+			() -> assertEquals(1, orderItems.orElseThrow().get(1).getQuantity()),
+			() -> assertEquals(new BigDecimal(1000.00), orderItems.orElseThrow().get(1).getUnitPrice())
+		);
+	}
+
+	@Test
+	void testFindByOrderIdAndProductSkuId() {
+		when(orderItemRepository.findByOrderIdAndProductSkuId(2L, 3L)).thenReturn(createOrderItem003());
+
+		Optional<OrderItem> orderItems = orderItemService.findByOrderIdAndProductSkuId(2L, 3L);
+
+		assertAll(
+			() -> assertTrue(orderItems.isPresent()),
+			() -> assertEquals(3L, orderItems.orElseThrow().getId()),
+			() -> assertEquals(2L, orderItems.orElseThrow().getOrder().getId()),
+			() -> assertEquals(3L, orderItems.orElseThrow().getProductSku().getId()),
+			() -> assertEquals(2L, orderItems.orElseThrow().getDiscount().getId()),
+			() -> assertEquals(1, orderItems.orElseThrow().getQuantity()),
+			() -> assertEquals(new BigDecimal(1299.99), orderItems.orElseThrow().getUnitPrice())
+		);
+	}
+
 }
