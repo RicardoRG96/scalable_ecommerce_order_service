@@ -114,4 +114,48 @@ public class OrderServiceImplTest {
 		);
 	}
 
+    @Test
+	void testFindByPaymentStatus() {
+		when(orderRepository.findByPaymentStatus("COMPLETED")).thenReturn(createListOfOrdersByPaymentStatus());
+		
+		Optional<List<Order>> orders = orderService.findByPaymentStatus("COMPLETED");
+
+		assertAll(
+			() -> assertTrue(orders.isPresent()),
+			() -> assertEquals(4, orders.orElseThrow().size()),
+			() -> assertEquals(2L, orders.orElseThrow().get(0).getId()),
+			() -> assertEquals(2L, orders.orElseThrow().get(0).getUser().getId()),
+			() -> assertEquals(2L, orders.orElseThrow().get(0).getShippingAddress().getId()),
+			() -> assertEquals(2L, orders.orElseThrow().get(0).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("49.99"), orders.orElseThrow().get(0).getTotalAmount()),
+			() -> assertEquals(3L, orders.orElseThrow().get(1).getId()),
+			() -> assertEquals(3L, orders.orElseThrow().get(1).getUser().getId()),
+			() -> assertEquals(3L, orders.orElseThrow().get(1).getShippingAddress().getId()),
+			() -> assertEquals(3L, orders.orElseThrow().get(1).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("89.99"), orders.orElseThrow().get(1).getTotalAmount())
+		);
+	}
+
+	@Test
+	void testFindByShippingAddressId() {
+		when(orderRepository.findByShippingAddressId(1L)).thenReturn(createListOfOrdersByShippingAddressId1());
+		
+		Optional<List<Order>> orders = orderService.findByShippingAddressId(1L);
+
+		assertAll(
+			() -> assertTrue(orders.isPresent()),
+			() -> assertEquals(2, orders.orElseThrow().size()),
+			() -> assertEquals(1L, orders.orElseThrow().get(0).getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(0).getUser().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(0).getShippingAddress().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(0).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("199.99"), orders.orElseThrow().get(0).getTotalAmount()),
+			() -> assertEquals(4L, orders.orElseThrow().get(1).getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getUser().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getShippingAddress().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("39.99"), orders.orElseThrow().get(1).getTotalAmount())
+		);
+	}
+
 }
