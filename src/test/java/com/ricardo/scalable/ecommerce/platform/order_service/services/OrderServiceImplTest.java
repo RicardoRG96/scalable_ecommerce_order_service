@@ -77,4 +77,41 @@ public class OrderServiceImplTest {
 		);
 	}
 
+    @Test
+	void testFindByIdAndUserId() {
+		when(orderRepository.findByIdAndUserId(2L, 2L)).thenReturn(createOrder002());
+		
+		Optional<Order> order = orderService.findByIdAndUserId(2L, 2L);
+
+		assertAll(
+			() -> assertTrue(order.isPresent()),
+			() -> assertEquals(2L, order.orElseThrow().getId()),
+			() -> assertEquals(2L, order.orElseThrow().getUser().getId()),
+			() -> assertEquals(2L, order.orElseThrow().getShippingAddress().getId()),
+			() -> assertEquals(2L, order.orElseThrow().getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("49.99"), order.orElseThrow().getTotalAmount())
+		);
+	}
+
+	@Test
+	void testFindByOrderStatus() {
+		when(orderRepository.findByOrderStatus("PAID")).thenReturn(createListOfOrdersByOrderStatus());
+		
+		Optional<List<Order>> orders = orderService.findByOrderStatus("PAID");
+
+		assertAll(
+			() -> assertTrue(orders.isPresent()),
+			() -> assertEquals(2L, orders.orElseThrow().get(0).getId()),
+			() -> assertEquals(2L, orders.orElseThrow().get(0).getUser().getId()),
+			() -> assertEquals(2L, orders.orElseThrow().get(0).getShippingAddress().getId()),
+			() -> assertEquals(2L, orders.orElseThrow().get(0).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("49.99"), orders.orElseThrow().get(0).getTotalAmount()),
+			() -> assertEquals(4L, orders.orElseThrow().get(1).getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getUser().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getShippingAddress().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("39.99"), orders.orElseThrow().get(1).getTotalAmount())
+		);
+	}
+
 }
