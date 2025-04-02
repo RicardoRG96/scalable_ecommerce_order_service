@@ -173,4 +173,21 @@ public class OrderItemServiceImplTest {
 		);
 	}
 
+    @Test
+	void testFindAll() {
+		when(orderItemRepository.findAll()).thenReturn(createListOfOrderItems());
+
+		List<OrderItem> orderItems = orderItemService.findAll();
+
+		assertAll(
+			() -> assertEquals(7, orderItems.size()),
+			() -> assertEquals(1L, orderItems.get(0).getId()),
+			() -> assertEquals(1L, orderItems.get(0).getOrder().getId()),
+			() -> assertEquals(new BigDecimal(1000.00), orderItems.get(0).getUnitPrice()),
+			() -> assertEquals(7L, orderItems.get(6).getId()),
+			() -> assertEquals(5L, orderItems.get(6).getOrder().getId()),
+			() -> assertEquals(new BigDecimal(50.00), orderItems.get(6).getUnitPrice())
+		);
+	}
+
 }
