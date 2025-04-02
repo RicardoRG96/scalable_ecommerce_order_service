@@ -286,4 +286,13 @@ public class OrderServiceImplTest {
 		);
 	}
 
+    @Test
+	void testDelete() {
+		doNothing().when(orderRepository).deleteById(5L);
+
+		orderService.delete(5L);
+
+		verify(orderRepository, times(1)).deleteById(5L);
+	}
+
 }
