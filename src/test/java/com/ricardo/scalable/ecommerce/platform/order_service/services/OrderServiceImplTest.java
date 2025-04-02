@@ -158,4 +158,47 @@ public class OrderServiceImplTest {
 		);
 	}
 
+    @Test
+	void testFindByBillingAddressId() {
+		when(orderRepository.findByBillingAddressId(1L)).thenReturn(createListOfOrdersByBillingAddressId1());
+		
+		Optional<List<Order>> orders = orderService.findByBillingAddressId(1L);
+
+		assertAll(
+			() -> assertTrue(orders.isPresent()),
+			() -> assertEquals(2, orders.orElseThrow().size()),
+			() -> assertEquals(1L, orders.orElseThrow().get(0).getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(0).getUser().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(0).getShippingAddress().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(0).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("199.99"), orders.orElseThrow().get(0).getTotalAmount()),
+			() -> assertEquals(4L, orders.orElseThrow().get(1).getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getUser().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getShippingAddress().getId()),
+			() -> assertEquals(1L, orders.orElseThrow().get(1).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("39.99"), orders.orElseThrow().get(1).getTotalAmount())
+		);
+	}
+
+	@Test
+	void testFindAll() {
+		when(orderRepository.findAll()).thenReturn(createListOfOrders());
+		
+		List<Order> orders = orderService.findAll();
+
+		assertAll(
+			() -> assertEquals(5, orders.size()),
+			() -> assertEquals(1L, orders.get(0).getId()),
+			() -> assertEquals(1L, orders.get(0).getUser().getId()),
+			() -> assertEquals(1L, orders.get(0).getShippingAddress().getId()),
+			() -> assertEquals(1L, orders.get(0).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("199.99"), orders.get(0).getTotalAmount()),
+			() -> assertEquals(4L, orders.get(3).getId()),
+			() -> assertEquals(1L, orders.get(3).getUser().getId()),
+			() -> assertEquals(1L, orders.get(3).getShippingAddress().getId()),
+			() -> assertEquals(1L, orders.get(3).getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("39.99"), orders.get(3).getTotalAmount())
+		);
+	}
+
 }
