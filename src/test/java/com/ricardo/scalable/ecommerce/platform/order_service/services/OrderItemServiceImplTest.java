@@ -190,4 +190,47 @@ public class OrderItemServiceImplTest {
 		);
 	}
 
+    @Test
+	void testSave() {
+		when(orderRepository.findById(4L)).thenReturn(createOrder004());
+		when(productSkuRepository.findById(7L)).thenReturn(createProductSku007());
+		when(discountRepository.findById(2L)).thenReturn(createDiscount002());
+		when(orderItemRepository.save(any())).thenReturn(createOrderItemCreationResponse());
+
+		OrderItemDto orderItemDto = createOrderItemDtoCreationRequest();
+		Optional<OrderItem> createdOrderItem = orderItemService.save(orderItemDto);
+
+		assertAll(
+			() -> assertTrue(createdOrderItem.isPresent()),
+			() -> assertEquals(8L, createdOrderItem.orElseThrow().getId()),
+			() -> assertEquals(4L, createdOrderItem.orElseThrow().getOrder().getId()),
+			() -> assertEquals(7L, createdOrderItem.orElseThrow().getProductSku().getId()),
+			() -> assertEquals(2L, createdOrderItem.orElseThrow().getDiscount().getId()),
+			() -> assertEquals(1, createdOrderItem.orElseThrow().getQuantity()),
+			() -> assertEquals(new BigDecimal(40.00), createdOrderItem.orElseThrow().getUnitPrice())
+		);
+	}
+
+	@Test
+	void testUpdate() {
+		when(orderItemRepository.findById(5L)).thenReturn(createOrderItem005());
+		when(orderRepository.findById(3L)).thenReturn(createOrder003());
+		when(productSkuRepository.findById(5L)).thenReturn(createProductSku005());
+		when(discountRepository.findById(3L)).thenReturn(createDiscount003());
+		when(orderItemRepository.save(any())).thenReturn(createOrderItemUpdateResponse());
+
+		OrderItemDto orderItemDto = createOrderItemDtoUpdateRequest();
+		Optional<OrderItem> updatedOrderItem = orderItemService.update(5L, orderItemDto);
+
+		assertAll(
+			() -> assertTrue(updatedOrderItem.isPresent()),
+			() -> assertEquals(5L, updatedOrderItem.orElseThrow().getId()),
+			() -> assertEquals(3L, updatedOrderItem.orElseThrow().getOrder().getId()),
+			() -> assertEquals(5L, updatedOrderItem.orElseThrow().getProductSku().getId()),
+			() -> assertEquals(3L, updatedOrderItem.orElseThrow().getDiscount().getId()),
+			() -> assertEquals(3, updatedOrderItem.orElseThrow().getQuantity()),
+			() -> assertEquals(new BigDecimal(25.00), updatedOrderItem.orElseThrow().getUnitPrice())
+		);
+	}
+
 }
