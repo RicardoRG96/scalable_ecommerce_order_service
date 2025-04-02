@@ -233,4 +233,14 @@ public class OrderItemServiceImplTest {
 		);
 	}
 
+    @Test
+	void testDelete() {
+		doNothing().when(orderItemRepository).deleteById(6L);
+
+		orderItemService.delete(6L);
+
+		verify(orderItemRepository, times(1)).deleteById(6L);
+	}
+
+
 }
