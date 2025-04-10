@@ -492,6 +492,135 @@ public class OrderControllerTest {
 	}
 
     @Test
+	@Order(24)
+	void testUpdateOrder() {
+		OrderDto requestBody = createOrderUpdateDto();
+		
+		client.put()
+			.uri("/7")
+			.contentType(MediaType.APPLICATION_JSON)
+                	.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+            .consumeWith(res -> {
+                try {
+                    JsonNode json = objectMapper.readTree(res.getResponseBody());
+                    assertAll(
+                        () -> assertNotNull(json),
+                        () -> assertEquals(7L, json.path("id").asLong()),
+                        () -> assertEquals(2L, json.path("user").path("id").asLong()),
+                        () -> assertEquals(89.99, json.path("totalAmount").asDouble()),
+                        () -> assertEquals("PENDING", json.path("orderStatus").asText()),
+                        () -> assertEquals("PENDING", json.path("paymentStatus").asText()),
+                        () -> assertEquals(2L, json.path("shippingAddress").path("id").asLong()),
+                        () -> assertEquals(2L, json.path("billingAddress").path("id").asLong())	
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+	}
+
+	@Test
+	@Order(25)
+	void testUpdateOrderWithNoUserId() {
+		OrderDto requestBody = createOrderUpdateDto();
+		requestBody.setUserId(null);
+		
+		client.put()
+			.uri("/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(26)
+	void testUpdateOrderWithNoShippingAddressId() {
+		OrderDto requestBody = createOrderUpdateDto();
+		requestBody.setShippingAddressId(null);
+		
+		client.put()
+			.uri("/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(27)
+	void testUpdateOrderWithNoBillingAddressId() {
+		OrderDto requestBody = createOrderUpdateDto();
+		requestBody.setBillingAddressId(null);
+		
+		client.put()
+			.uri("/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(28)
+	void testUpdateOrderNotFound() {
+		OrderDto requestBody = createOrderUpdateDto();
+		
+		client.put()
+			.uri("/999")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(29)
+	void testUpdateOrderNotFoundUserId() {
+		OrderDto requestBody = createOrderUpdateDto();
+		requestBody.setUserId(999L);
+		
+		client.put()
+			.uri("/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(30)
+	void testUpdateOrderNotFoundShippingAddressId() {
+		OrderDto requestBody = createOrderUpdateDto();
+		requestBody.setShippingAddressId(999L);
+		
+		client.put()
+			.uri("/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(31)
+	void testUpdateOrderNotFoundBillingAddressId() {
+		OrderDto requestBody = createOrderUpdateDto();
+		requestBody.setBillingAddressId(999L);
+		
+		client.put()
+			.uri("/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+    @Test
     void testProfile() {
         String[] activeProfiles = env.getActiveProfiles();
         assertArrayEquals(new String[] { "test" }, activeProfiles);
