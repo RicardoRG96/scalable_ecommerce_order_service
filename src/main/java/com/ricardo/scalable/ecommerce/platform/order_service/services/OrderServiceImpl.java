@@ -46,12 +46,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Optional<List<Order>> findByOrderStatus(String orderStatus) {
+    public Optional<List<Order>> findByOrderStatus(OrderStatus orderStatus) {
         return orderRepository.findByOrderStatus(orderStatus);
     }
 
     @Override
-    public Optional<List<Order>> findByPaymentStatus(String paymentStatus) {
+    public Optional<List<Order>> findByPaymentStatus(PaymentStatus paymentStatus) {
         return orderRepository.findByPaymentStatus(paymentStatus);
     }
 

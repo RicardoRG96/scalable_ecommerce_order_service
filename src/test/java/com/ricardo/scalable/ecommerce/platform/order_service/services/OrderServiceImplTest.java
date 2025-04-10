@@ -97,9 +97,9 @@ public class OrderServiceImplTest {
 
 	@Test
 	void testFindByOrderStatus() {
-		when(orderRepository.findByOrderStatus("PAID")).thenReturn(createListOfOrdersByOrderStatus());
+		when(orderRepository.findByOrderStatus(OrderStatus.PAID)).thenReturn(createListOfOrdersByOrderStatus());
 		
-		Optional<List<Order>> orders = orderService.findByOrderStatus("PAID");
+		Optional<List<Order>> orders = orderService.findByOrderStatus(OrderStatus.PAID);
 
 		assertAll(
 			() -> assertTrue(orders.isPresent()),
@@ -118,9 +118,9 @@ public class OrderServiceImplTest {
 
     @Test
 	void testFindByPaymentStatus() {
-		when(orderRepository.findByPaymentStatus("COMPLETED")).thenReturn(createListOfOrdersByPaymentStatus());
+		when(orderRepository.findByPaymentStatus(PaymentStatus.COMPLETED)).thenReturn(createListOfOrdersByPaymentStatus());
 		
-		Optional<List<Order>> orders = orderService.findByPaymentStatus("COMPLETED");
+		Optional<List<Order>> orders = orderService.findByPaymentStatus(PaymentStatus.COMPLETED);
 
 		assertAll(
 			() -> assertTrue(orders.isPresent()),

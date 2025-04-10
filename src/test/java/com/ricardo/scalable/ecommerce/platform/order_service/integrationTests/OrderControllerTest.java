@@ -167,6 +167,53 @@ public class OrderControllerTest {
 	}
 
     @Test
+	@Order(8)
+	void testGetOrderByOrderStatus() {
+		client.get()
+			.uri("/status/shipped")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+            .consumeWith(res -> {
+                try {
+                    JsonNode json = objectMapper.readTree(res.getResponseBody());
+                    assertAll(
+                        () -> assertNotNull(json),
+                        () -> assertTrue(json.isArray()),
+                        () -> assertEquals(2, json.size()),
+                        () -> assertEquals(3L, json.get(0).path("id").asLong()),
+                        () -> assertEquals(2L, json.get(0).path("user").path("id").asLong()),
+                        () -> assertEquals(249.99, json.get(0).path("totalAmount").asDouble()),
+                        () -> assertEquals("SHIPPED", json.get(0).path("orderStatus").asText()),
+                        () -> assertEquals("COMPLETED", json.get(0).path("paymentStatus").asText()),
+                        () -> assertEquals(2L, json.get(0).path("shippingAddress").path("id").asLong()),
+                        () -> assertEquals(2L, json.get(0).path("billingAddress").path("id").asLong()),
+                        () -> assertEquals(5L, json.get(1).path("id").asLong()),
+                        () -> assertEquals(3L, json.get(1).path("user").path("id").asLong()),
+                        () -> assertEquals(49.99, json.get(1).path("totalAmount").asDouble()),
+                        () -> assertEquals("SHIPPED", json.get(1).path("orderStatus").asText()),
+                        () -> assertEquals("COMPLETED", json.get(1).path("paymentStatus").asText()),
+                        () -> assertEquals(3L, json.get(1).path("shippingAddress").path("id").asLong()),
+                        () -> assertEquals(3L, json.get(1).path("billingAddress").path("id").asLong())		
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+	}
+
+	@Test
+	@Order(9)
+	void testGetOrderByOrderStatusNotFound() {
+		client.get()
+			.uri("/status/not-shipped")
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+
+    @Test
     void testProfile() {
         String[] activeProfiles = env.getActiveProfiles();
         assertArrayEquals(new String[] { "test" }, activeProfiles);

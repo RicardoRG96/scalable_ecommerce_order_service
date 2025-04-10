@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
+import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
+import com.ricardo.scalable.ecommerce.platform.libs_common.enums.PaymentStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
@@ -64,24 +66,34 @@ public class OrderController {
 
     @GetMapping("/status/{orderStatus}")
     public ResponseEntity<List<Order>> getOrderByOrderStatus(@PathVariable String orderStatus) {
-        Optional<List<Order>> orderOptional = orderService.findByOrderStatus(orderStatus);
-        boolean isEmpty = orderOptional.orElseThrow().isEmpty();
-        
-        if (orderOptional.isPresent() && !isEmpty) {
-            return ResponseEntity.ok(orderOptional.orElseThrow());
+        try {
+            OrderStatus orderStatusEnum = OrderStatus.valueOf(orderStatus.toUpperCase());
+            Optional<List<Order>> orderOptional = orderService.findByOrderStatus(orderStatusEnum);
+            boolean isEmpty = orderOptional.orElseThrow().isEmpty();
+            
+            if (orderOptional.isPresent() && !isEmpty) {
+                return ResponseEntity.ok(orderOptional.orElseThrow());
+            }
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/payment-status/{paymentStatus}")
     public ResponseEntity<List<Order>> getOrderByPaymentStatus(@PathVariable String paymentStatus) {
-        Optional<List<Order>> orderOptional = orderService.findByPaymentStatus(paymentStatus);
-        boolean isEmpty = orderOptional.orElseThrow().isEmpty();
-        
-        if (orderOptional.isPresent() && !isEmpty) {
-            return ResponseEntity.ok(orderOptional.orElseThrow());
+        try {
+            PaymentStatus paymentStatusEnum = PaymentStatus.valueOf(paymentStatus.toUpperCase());
+            Optional<List<Order>> orderOptional = orderService.findByPaymentStatus(paymentStatusEnum);
+            boolean isEmpty = orderOptional.orElseThrow().isEmpty();
+            
+            if (orderOptional.isPresent() && !isEmpty) {
+                return ResponseEntity.ok(orderOptional.orElseThrow());
+            }
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/shipping-address/{shippingAddressId}")
