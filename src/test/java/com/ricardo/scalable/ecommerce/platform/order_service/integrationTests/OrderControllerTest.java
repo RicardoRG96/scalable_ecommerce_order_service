@@ -120,6 +120,53 @@ public class OrderControllerTest {
 	}
 
     @Test
+	@Order(5)
+	void testGetOrderByIdAndUserId() {
+		client.get()
+			.uri("/3/user/2")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+            .consumeWith(res -> {
+                try {
+                    JsonNode json = objectMapper.readTree(res.getResponseBody());
+                    assertAll(
+                        () -> assertNotNull(json),
+                        () -> assertEquals(3L, json.path("id").asLong()),
+                        () -> assertEquals(2L, json.path("user").path("id").asLong()),
+                        () -> assertEquals(249.99, json.path("totalAmount").asDouble()),
+                        () -> assertEquals("SHIPPED", json.path("orderStatus").asText()),
+                        () -> assertEquals("COMPLETED", json.path("paymentStatus").asText()),
+                        () -> assertEquals(2L, json.path("shippingAddress").path("id").asLong()),
+                        () -> assertEquals(2L, json.path("billingAddress").path("id").asLong())	
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+	}
+
+	
+	@Test
+	@Order(6)
+	void testGetOrderByIdAndUserIdNotFoundOrder() {
+		client.get()
+			.uri("/999/user/1")
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(7)
+	void testGetOrderByIdAndUserIdNotFoundUser() {
+		client.get()
+			.uri("/1/user/999")
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+    @Test
     void testProfile() {
         String[] activeProfiles = env.getActiveProfiles();
         assertArrayEquals(new String[] { "test" }, activeProfiles);
