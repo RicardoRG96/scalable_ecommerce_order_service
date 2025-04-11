@@ -162,6 +162,42 @@ public class OrderItemControllerTest {
 	}
 
     @Test
+	@Order(7)
+	void testGetOrderItemByOrderIdAndProductSkuId() {
+		client.get()
+			.uri("/order-items/order/2/product-sku/3")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals(3L, json.path("id").asLong()),
+						() -> assertEquals(2L, json.path("order").path("id").asLong()),
+						() -> assertEquals(3L, json.path("productSku").path("id").asLong()),
+						() -> assertEquals(3, json.path("quantity").asInt()),
+						() -> assertEquals(29.99, json.path("unitPrice").asDouble()),
+						() -> assertEquals(1L, json.path("discount").path("id").asLong())	
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+	@Test
+	@Order(8)
+	void testGetOrderItemByOrderIdAndProductSkuIdNotFound() {
+		client.get()
+			.uri("/order-items/order/999/product-sku/999")
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+    @Test
     void testProfile() {
         String[] activeProfiles = env.getActiveProfiles();
         assertArrayEquals(new String[] { "test" }, activeProfiles);
