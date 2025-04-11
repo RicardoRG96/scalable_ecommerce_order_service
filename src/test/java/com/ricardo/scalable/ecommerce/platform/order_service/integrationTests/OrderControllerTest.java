@@ -737,7 +737,7 @@ public class OrderControllerTest {
 		client.put()
 			.uri("/payment-status")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isBadRequest();
 	}
@@ -751,7 +751,7 @@ public class OrderControllerTest {
 		client.put()
 			.uri("/payment-status")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isBadRequest();
 	}
@@ -765,7 +765,44 @@ public class OrderControllerTest {
 		client.put()
 			.uri("/payment-status")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(40)
+	void testDeleteOrder() {	
+		client.delete()
+			.uri("/7")
+			.exchange()
+			.expectStatus().isNoContent();
+
+		client.get()
+			.uri("/")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertTrue(json.isArray()),
+						() -> assertEquals(6, json.size())	
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+	
+	@Test
+	@Order(41)
+	void testGetDeletedOrder() {	
+		client.get()
+			.uri("/7")
 			.exchange()
 			.expectStatus().isNotFound();
 	}
