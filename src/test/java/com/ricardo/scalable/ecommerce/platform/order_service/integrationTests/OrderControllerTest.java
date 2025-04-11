@@ -19,6 +19,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -616,6 +617,80 @@ public class OrderControllerTest {
 			.uri("/1")
 			.contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(32)
+	void testUpdateOrderStatus() {
+		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
+		
+		client.put()
+			.uri("/status")
+			.contentType(MediaType.APPLICATION_JSON)
+                	.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals(2L, json.path("id").asLong()),
+						() -> assertEquals(1L, json.path("user").path("id").asLong()),
+						() -> assertEquals(49.99, json.path("totalAmount").asDouble()),
+						() -> assertEquals("SHIPPED", json.path("orderStatus").asText()),
+						() -> assertEquals("COMPLETED", json.path("paymentStatus").asText()),
+						() -> assertEquals(1L, json.path("shippingAddress").path("id").asLong()),
+						() -> assertEquals(1L, json.path("billingAddress").path("id").asLong())	
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+	@Test
+	@Order(33)
+	void testUpdateOrderStatusWithNoOrderId() {
+		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
+		requestBody.setOrderId(null);
+		
+		client.put()
+			.uri("/status")
+			.contentType(MediaType.APPLICATION_JSON)
+                	.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(34)
+	void testUpdateOrderStatusWithNoOrderStatus() {
+		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
+		requestBody.setOrderStatus(null);
+		
+		client.put()
+			.uri("/status")
+			.contentType(MediaType.APPLICATION_JSON)
+                	.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(35)
+	void testUpdateOrderStatusNotFound() {
+		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
+		requestBody.setOrderId(999L);
+		
+		client.put()
+			.uri("/status")
+			.contentType(MediaType.APPLICATION_JSON)
+                	.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isNotFound();
 	}
