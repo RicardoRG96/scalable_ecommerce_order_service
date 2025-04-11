@@ -9,6 +9,7 @@ import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Discount;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.ProductSku;
 
+import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,7 +47,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "discount_id")
-    @NotNull
+    @Nullable
     private Discount discount;
 
     @Column(name = "created_at")

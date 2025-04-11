@@ -28,5 +28,15 @@ public class OrderItemControllerTestData {
 
 		return orderItemDto;
 	}
+	public static OrderItemDto createOrderItemCreationDtoWithNullDiscount() {
+		OrderItemDto orderItemDto = new OrderItemDto();
+		orderItemDto.setOrderId(2L);
+		orderItemDto.setProductSkuId(4L);
+		orderItemDto.setQuantity(3);
+		orderItemDto.setUnitPrice(new BigDecimal("29.99"));
+		orderItemDto.setDiscountId(null);
+
+		return orderItemDto;
+	}
 
 }

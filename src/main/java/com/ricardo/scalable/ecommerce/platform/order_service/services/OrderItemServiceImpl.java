@@ -71,7 +71,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     public Optional<OrderItem> save(OrderItemDto orderItem) {
         Optional<Order> orderOptional = orderRepository.findById(orderItem.getOrderId());
         Optional<ProductSku> productSkuOptional = productSkuRepository.findById(orderItem.getProductSkuId());
-        Optional<Discount> discountOptional = discountRepository.findById(orderItem.getDiscountId());
+        // Optional<Discount> discountOptional = discountRepository.findById(orderItem.getDiscountId());
         
         if (
             orderOptional.isPresent() && 
@@ -79,14 +79,22 @@ public class OrderItemServiceImpl implements OrderItemService {
         ) {
             Order order = orderOptional.orElseThrow();
             ProductSku productSku = productSkuOptional.orElseThrow();
-            Discount discount = discountOptional.orElseThrow();
-
+        
             OrderItem createdOrderItem = new OrderItem();
             createdOrderItem.setOrder(order);
             createdOrderItem.setProductSku(productSku);
             createdOrderItem.setQuantity(orderItem.getQuantity());
             createdOrderItem.setUnitPrice(orderItem.getUnitPrice());
-            createdOrderItem.setDiscount(discount);
+            if (orderItem.getDiscountId() == null) {
+                createdOrderItem.setDiscount(null);
+            } else {
+                Optional<Discount> discountOptional = discountRepository.findById(orderItem.getDiscountId());
+                if (discountOptional.isEmpty()) {
+                    return Optional.empty();
+                }
+                Discount discount = discountOptional.orElseThrow();
+                createdOrderItem.setDiscount(discount);
+            }
 
             return Optional.of(orderItemRepository.save(createdOrderItem));
         }
@@ -103,19 +111,22 @@ public class OrderItemServiceImpl implements OrderItemService {
         if (
             orderItemOptional.isPresent() && 
             orderOptional.isPresent() && 
-            productSkuOptional.isPresent() &&
-            discountOptional.isPresent()
+            productSkuOptional.isPresent()
         ) {
             OrderItem orderItemToUpdate = orderItemOptional.orElseThrow();
             Order order = orderOptional.orElseThrow();
             ProductSku productSku = productSkuOptional.orElseThrow();
-            Discount discount = discountOptional.orElseThrow();
 
             orderItemToUpdate.setOrder(order);
             orderItemToUpdate.setProductSku(productSku);
             orderItemToUpdate.setQuantity(orderItem.getQuantity());
             orderItemToUpdate.setUnitPrice(orderItem.getUnitPrice());
-            orderItemToUpdate.setDiscount(discount);
+            if (discountOptional.isEmpty()) {
+                orderItemToUpdate.setDiscount(null);
+            } else {
+                Discount discount = discountOptional.orElseThrow();
+                orderItemToUpdate.setDiscount(discount);
+            }
 
             return Optional.of(orderItemRepository.save(orderItemToUpdate));
         }

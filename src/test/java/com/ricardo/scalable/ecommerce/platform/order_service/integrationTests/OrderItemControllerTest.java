@@ -18,6 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderItemDto;
 
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -306,6 +307,121 @@ public class OrderItemControllerTest {
 					e.printStackTrace();
 				}
 			});
+	}
+
+    @Test
+	@Order(14)
+	void testCreateOrderItem() {
+		OrderItemDto requestBody = createOrderItemCreationDto();
+			
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isCreated()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals(9L, json.path("id").asLong()),
+						() -> assertEquals(2L, json.path("order").path("id").asLong()),
+						() -> assertEquals(3L, json.path("productSku").path("id").asLong()),
+						() -> assertEquals(2, json.path("quantity").asInt()),
+						() -> assertEquals(29.99, json.path("unitPrice").asDouble()),
+						() -> assertEquals(2L, json.path("discount").path("id").asLong())	
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+	
+	@Test
+	@Order(15)
+	void testCreateOrderItemWithNoOrderId() {
+		OrderItemDto requestBody = createOrderItemCreationDto();
+		requestBody.setOrderId(null);
+			
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(16)
+	void testCreateOrderItemWithNoProductSkuId() {
+		OrderItemDto requestBody = createOrderItemCreationDto();
+		requestBody.setProductSkuId(null);
+			
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(17)
+	void testCreateOrderItemWithNoDiscountId() {
+		OrderItemDto requestBody = createOrderItemCreationDtoWithNullDiscount();
+		requestBody.setDiscountId(null);
+			
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isCreated();
+	}
+
+	@Test
+	@Order(18)
+	void testCreateOrderItemNotFoundOrderId() {
+		OrderItemDto requestBody = createOrderItemCreationDto();
+		requestBody.setOrderId(999L);
+			
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(19)
+	void testCreateOrderItemNotFoundProductSkuId() {
+		OrderItemDto requestBody = createOrderItemCreationDto();
+		requestBody.setProductSkuId(999L);
+			
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(20)
+	void testCreateOrderItemNotFoundDiscountId() {
+		OrderItemDto requestBody = createOrderItemCreationDto();
+		requestBody.setDiscountId(999L);
+			
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
 	}
 
     @Test
