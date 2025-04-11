@@ -198,6 +198,50 @@ public class OrderItemControllerTest {
 	}
 
     @Test
+	@Order(9)
+	void testGetOrderItemsByUnitPrice() {
+		client.get()
+			.uri("/order-items/unit-price/1500.99")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertTrue(json.isArray()),
+						() -> assertEquals(2, json.size()),
+						() -> assertEquals(1L, json.get(0).path("id").asLong()),
+						() -> assertEquals(1L, json.get(0).path("order").path("id").asLong()),
+						() -> assertEquals(1L, json.get(0).path("productSku").path("id").asLong()),
+						() -> assertEquals(1, json.get(0).path("quantity").asInt()),
+						() -> assertEquals(1500.99, json.get(0).path("unitPrice").asDouble()),
+						() -> assertEquals(1L, json.get(0).path("discount").path("id").asLong()),
+						() -> assertEquals(7L, json.get(1).path("id").asLong()),
+						() -> assertEquals(5L, json.get(1).path("order").path("id").asLong()),
+						() -> assertEquals(1L, json.get(1).path("productSku").path("id").asLong()),
+						() -> assertEquals(1, json.get(1).path("quantity").asInt()),
+						() -> assertEquals(1500.99, json.get(1).path("unitPrice").asDouble()),
+						() -> assertEquals(2L, json.get(1).path("discount").path("id").asLong())		
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+	
+	@Test
+	@Order(10)
+	void testGetOrderItemsByUnitPriceNotFound() {
+		client.get()
+			.uri("/order-items/unit-price/162315.99")
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+    @Test
     void testProfile() {
         String[] activeProfiles = env.getActiveProfiles();
         assertArrayEquals(new String[] { "test" }, activeProfiles);
