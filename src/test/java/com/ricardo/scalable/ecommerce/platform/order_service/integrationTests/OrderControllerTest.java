@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
 
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -384,7 +385,7 @@ public class OrderControllerTest {
 		client.post()
 			.uri("/")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isCreated()
 			.expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -417,7 +418,7 @@ public class OrderControllerTest {
 		client.post()
 			.uri("/")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isBadRequest();
 	}
@@ -431,7 +432,7 @@ public class OrderControllerTest {
 		client.post()
 			.uri("/")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isBadRequest();
 	}
@@ -445,7 +446,7 @@ public class OrderControllerTest {
 		client.post()
 			.uri("/")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isBadRequest();
 	}
@@ -459,7 +460,7 @@ public class OrderControllerTest {
 		client.post()
 			.uri("/")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isNotFound();
 	}
@@ -473,7 +474,7 @@ public class OrderControllerTest {
 		client.post()
 			.uri("/")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isNotFound();
 	}
@@ -487,7 +488,7 @@ public class OrderControllerTest {
 		client.post()
 			.uri("/")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isNotFound();
 	}
@@ -500,7 +501,7 @@ public class OrderControllerTest {
 		client.put()
 			.uri("/7")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isOk()
 			.expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -629,7 +630,7 @@ public class OrderControllerTest {
 		client.put()
 			.uri("/status")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isOk()
 			.expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -662,7 +663,7 @@ public class OrderControllerTest {
 		client.put()
 			.uri("/status")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isBadRequest();
 	}
@@ -676,7 +677,7 @@ public class OrderControllerTest {
 		client.put()
 			.uri("/status")
 			.contentType(MediaType.APPLICATION_JSON)
-                	.bodyValue(requestBody)
+			.bodyValue(requestBody)
 			.exchange()
 			.expectStatus().isBadRequest();
 	}
@@ -689,6 +690,80 @@ public class OrderControllerTest {
 		
 		client.put()
 			.uri("/status")
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(36)
+	void testUpdatePaymentStatus() {
+		UpdatePaymentStatusDto requestBody = createUpdatePaymentStatusDto();
+		
+		client.put()
+			.uri("/payment-status")
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals(1L, json.path("id").asLong()),
+						() -> assertEquals(1L, json.path("user").path("id").asLong()),
+						() -> assertEquals(89.99, json.path("totalAmount").asDouble()),
+						() -> assertEquals("PENDING", json.path("orderStatus").asText()),
+						() -> assertEquals("COMPLETED", json.path("paymentStatus").asText()),
+						() -> assertEquals(1L, json.path("shippingAddress").path("id").asLong()),
+						() -> assertEquals(1L, json.path("billingAddress").path("id").asLong())	
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+	@Test
+	@Order(37)
+	void testUpdatePaymentStatusWithNoOrderId() {
+		UpdatePaymentStatusDto requestBody = createUpdatePaymentStatusDto();
+		requestBody.setOrderId(null);
+		
+		client.put()
+			.uri("/payment-status")
+			.contentType(MediaType.APPLICATION_JSON)
+                	.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(38)
+	void testUpdatePaymentStatusWithNoPaymentStatus() {
+		UpdatePaymentStatusDto requestBody = createUpdatePaymentStatusDto();
+		requestBody.setPaymentStatus(null);
+		
+		client.put()
+			.uri("/payment-status")
+			.contentType(MediaType.APPLICATION_JSON)
+                	.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(39)
+	void testUpdatePaymentStatusNotFound() {
+		UpdatePaymentStatusDto requestBody = createUpdatePaymentStatusDto();
+		requestBody.setOrderId(999L);
+		
+		client.put()
+			.uri("/payment-status")
 			.contentType(MediaType.APPLICATION_JSON)
                 	.bodyValue(requestBody)
 			.exchange()
