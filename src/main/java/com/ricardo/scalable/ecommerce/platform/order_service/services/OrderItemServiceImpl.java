@@ -71,7 +71,6 @@ public class OrderItemServiceImpl implements OrderItemService {
     public Optional<OrderItem> save(OrderItemDto orderItem) {
         Optional<Order> orderOptional = orderRepository.findById(orderItem.getOrderId());
         Optional<ProductSku> productSkuOptional = productSkuRepository.findById(orderItem.getProductSkuId());
-        // Optional<Discount> discountOptional = discountRepository.findById(orderItem.getDiscountId());
         
         if (
             orderOptional.isPresent() && 
@@ -106,7 +105,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         Optional<OrderItem> orderItemOptional = orderItemRepository.findById(id);
         Optional<Order> orderOptional = orderRepository.findById(orderItem.getOrderId());
         Optional<ProductSku> productSkuOptional = productSkuRepository.findById(orderItem.getProductSkuId());
-        Optional<Discount> discountOptional = discountRepository.findById(orderItem.getDiscountId());
+        
 
         if (
             orderItemOptional.isPresent() && 
@@ -121,9 +120,13 @@ public class OrderItemServiceImpl implements OrderItemService {
             orderItemToUpdate.setProductSku(productSku);
             orderItemToUpdate.setQuantity(orderItem.getQuantity());
             orderItemToUpdate.setUnitPrice(orderItem.getUnitPrice());
-            if (discountOptional.isEmpty()) {
+            if (orderItem.getDiscountId() == null) {
                 orderItemToUpdate.setDiscount(null);
             } else {
+                Optional<Discount> discountOptional = discountRepository.findById(orderItem.getDiscountId());
+                if (discountOptional.isEmpty()) {
+                    return Optional.empty();
+                }
                 Discount discount = discountOptional.orElseThrow();
                 orderItemToUpdate.setDiscount(discount);
             }

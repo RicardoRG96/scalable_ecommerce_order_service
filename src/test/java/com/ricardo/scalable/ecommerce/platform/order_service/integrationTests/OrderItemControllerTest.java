@@ -425,6 +425,134 @@ public class OrderItemControllerTest {
 	}
 
     @Test
+	@Order(21)
+	void testUpdateOrderItem() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+			
+		client.put()
+			.uri("/order-items/9")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals(9L, json.path("id").asLong()),
+						() -> assertEquals(2L, json.path("order").path("id").asLong()),
+						() -> assertEquals(3L, json.path("productSku").path("id").asLong()),
+						() -> assertEquals(4, json.path("quantity").asInt()),
+						() -> assertEquals(29.99, json.path("unitPrice").asDouble()),
+						() -> assertEquals(3L, json.path("discount").path("id").asLong())	
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+	@Test
+	@Order(22)
+	void testUpdateOrderItemWithNoOrderId() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+		requestBody.setOrderId(null);
+			
+		client.put()
+			.uri("/order-items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(23)
+	void testUpdateOrderItemWithNoProductSkuId() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+		requestBody.setProductSkuId(null);
+			
+		client.put()
+			.uri("/order-items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	@Order(24)
+	void testUpdateOrderItemWithNoDiscountId() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+		requestBody.setDiscountId(null);
+			
+		client.put()
+			.uri("/order-items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isOk();
+	}
+
+	@Test
+	@Order(25)
+	void testUpdateOrderItemNotFound() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+			
+		client.put()
+			.uri("/order-items/999")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(26)
+	void testUpdateOrderItemNotFoundOrderId() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+		requestBody.setOrderId(999L);
+			
+		client.put()
+			.uri("/order-items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(27)
+	void testUpdateOrderItemNotFoundProductSkuId() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+		requestBody.setProductSkuId(999L);
+			
+		client.put()
+			.uri("/order-items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+	@Test
+	@Order(28)
+	void testUpdateOrderItemNotFoundDiscountId() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+		requestBody.setDiscountId(999L);
+			
+		client.put()
+			.uri("/order-items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
+    @Test
     void testProfile() {
         String[] activeProfiles = env.getActiveProfiles();
         assertArrayEquals(new String[] { "test" }, activeProfiles);
