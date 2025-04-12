@@ -552,6 +552,43 @@ public class OrderItemControllerTest {
 			.expectStatus().isNotFound();
 	}
 
+	@Test
+	@Order(29)
+	void testDeleteOrderItem() {	
+		client.delete()
+			.uri("/order-items/9")
+			.exchange()
+			.expectStatus().isNoContent();
+
+		client.get()
+			.uri("/order-items")
+			.exchange()
+			.expectStatus().isOk()
+			.expectHeader().contentType(MediaType.APPLICATION_JSON)
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertTrue(json.isArray()),
+						() -> assertEquals(9, json.size())	
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+	@Test
+	@Order(30)
+	void testGetDeletedOrderItem() {	
+		client.get()
+			.uri("/order-items/9")
+			.exchange()
+			.expectStatus().isNotFound();
+	}
+
     @Test
     void testProfile() {
         String[] activeProfiles = env.getActiveProfiles();
