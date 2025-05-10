@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Discount;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.ProductSku;
-import com.ricardo.scalable.ecommerce.platform.order_service.entities.OrderItem;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderItemDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.DiscountRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderItemRespository;

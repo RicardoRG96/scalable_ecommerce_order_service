@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import com.ricardo.scalable.ecommerce.platform.order_service.entities.OrderItem;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderItemDto;
 
 public interface OrderItemService {

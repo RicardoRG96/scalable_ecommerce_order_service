@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ricardo.scalable.ecommerce.platform.order_service.entities.OrderItem;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderItemDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.services.OrderItemService;
 

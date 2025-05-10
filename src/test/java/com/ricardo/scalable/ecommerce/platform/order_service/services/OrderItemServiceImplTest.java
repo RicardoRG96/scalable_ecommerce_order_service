@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.ricardo.scalable.ecommerce.platform.order_service.entities.OrderItem;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.DiscountRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderItemRespository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;

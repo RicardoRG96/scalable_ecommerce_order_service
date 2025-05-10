@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.ricardo.scalable.ecommerce.platform.order_service.entities.OrderItem;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
 
 public interface OrderItemRespository extends CrudRepository<OrderItem, Long> {
     
