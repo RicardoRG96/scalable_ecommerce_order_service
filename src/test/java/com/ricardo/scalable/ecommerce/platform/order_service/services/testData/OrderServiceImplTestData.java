@@ -10,10 +10,8 @@ import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Address;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.User;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
-import com.ricardo.scalable.ecommerce.platform.libs_common.enums.PaymentStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
-import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
 
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.AddressTestData.*;
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.UserTestData.*; 
@@ -40,7 +38,6 @@ public class OrderServiceImplTestData {
 		order.setUser(user);
         order.setTotalAmount(new BigDecimal("199.99"));
 		order.setOrderStatus(OrderStatus.valueOf("PENDING"));
-		order.setPaymentStatus(PaymentStatus.valueOf("PENDING"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
 		order.setCreatedAt(Timestamp.from(Instant.now()));
@@ -59,7 +56,6 @@ public class OrderServiceImplTestData {
 		order.setUser(user);
 		order.setTotalAmount(new BigDecimal("49.99"));
 		order.setOrderStatus(OrderStatus.valueOf("PAID"));
-		order.setPaymentStatus(PaymentStatus.valueOf("COMPLETED"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
 		order.setCreatedAt(Timestamp.from(Instant.now()));
@@ -78,7 +74,6 @@ public class OrderServiceImplTestData {
 		order.setUser(user);
 		order.setTotalAmount(new BigDecimal("89.99"));
 		order.setOrderStatus(OrderStatus.valueOf("SHIPPED"));
-		order.setPaymentStatus(PaymentStatus.valueOf("COMPLETED"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
 		order.setCreatedAt(Timestamp.from(Instant.now()));
@@ -97,7 +92,6 @@ public class OrderServiceImplTestData {
 		order.setUser(user);
 		order.setTotalAmount(new BigDecimal("39.99"));
 		order.setOrderStatus(OrderStatus.valueOf("PAID"));
-		order.setPaymentStatus(PaymentStatus.valueOf("COMPLETED"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
 		order.setCreatedAt(Timestamp.from(Instant.now()));
@@ -116,7 +110,6 @@ public class OrderServiceImplTestData {
 		order.setUser(user);
 		order.setTotalAmount(new BigDecimal("99.99"));
 		order.setOrderStatus(OrderStatus.valueOf("SHIPPED"));
-		order.setPaymentStatus(PaymentStatus.valueOf("COMPLETED"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
 		order.setCreatedAt(Timestamp.from(Instant.now()));
@@ -180,7 +173,6 @@ public class OrderServiceImplTestData {
 		orderDto.setUserId(3L);
 		orderDto.setTotalAmount(new BigDecimal("39.99"));
 		orderDto.setOrderStatus("PENDING");
-		orderDto.setPaymentStatus("PENDING");
 		orderDto.setShippingAddressId(3L);
 		orderDto.setBillingAddressId(3L);
 
@@ -194,7 +186,6 @@ public class OrderServiceImplTestData {
 		orderDto.setUserId(1L);
 		orderDto.setTotalAmount(new BigDecimal("119.99"));
 		orderDto.setOrderStatus("PENDING");
-		orderDto.setPaymentStatus("PENDING");
 		orderDto.setShippingAddressId(1L);
 		orderDto.setBillingAddressId(1L);
 
@@ -211,7 +202,6 @@ public class OrderServiceImplTestData {
 		order.setUser(user);
 		order.setTotalAmount(new BigDecimal("39.99"));
 		order.setOrderStatus(OrderStatus.valueOf("PENDING"));
-		order.setPaymentStatus(PaymentStatus.valueOf("PENDING"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
 		order.setCreatedAt(Timestamp.from(Instant.now()));
@@ -235,14 +225,6 @@ public class OrderServiceImplTestData {
 		return updateOrderStatus;
 	}
 
-	public static UpdatePaymentStatusDto createPaymentStatusUpdateRequest() {
-		UpdatePaymentStatusDto updatePaymentStatus = new UpdatePaymentStatusDto();
-		updatePaymentStatus.setOrderId(1L);
-		updatePaymentStatus.setPaymentStatus("COMPLETED");
-
-		return updatePaymentStatus;
-	}
-
 	public static Order createOrderStatusUpdateResponse() {
 		Order order = new Order();
 		User user = createUser001().orElseThrow();
@@ -253,7 +235,6 @@ public class OrderServiceImplTestData {
 		order.setUser(user);
 		order.setTotalAmount(new BigDecimal("199.99"));
 		order.setOrderStatus(OrderStatus.valueOf("PAID"));
-		order.setPaymentStatus(PaymentStatus.valueOf("PENDING"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
 		order.setCreatedAt(Timestamp.from(Instant.now()));
@@ -272,7 +253,6 @@ public class OrderServiceImplTestData {
 		order.setUser(user);
 		order.setTotalAmount(new BigDecimal("199.99"));
 		order.setOrderStatus(OrderStatus.valueOf("PENDING"));
-		order.setPaymentStatus(PaymentStatus.valueOf("COMPLETED"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
 		order.setCreatedAt(Timestamp.from(Instant.now()));

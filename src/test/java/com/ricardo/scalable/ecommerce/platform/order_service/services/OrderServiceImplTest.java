@@ -15,13 +15,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
-import com.ricardo.scalable.ecommerce.platform.libs_common.enums.PaymentStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.AddressRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.UserRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
-import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
 
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.OrderServiceImplTestData.*;
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.UserTestData.*;
@@ -116,28 +114,6 @@ public class OrderServiceImplTest {
 		);
 	}
 
-    @Test
-	void testFindByPaymentStatus() {
-		when(orderRepository.findByPaymentStatus(PaymentStatus.COMPLETED)).thenReturn(createListOfOrdersByPaymentStatus());
-		
-		Optional<List<Order>> orders = orderService.findByPaymentStatus(PaymentStatus.COMPLETED);
-
-		assertAll(
-			() -> assertTrue(orders.isPresent()),
-			() -> assertEquals(4, orders.orElseThrow().size()),
-			() -> assertEquals(2L, orders.orElseThrow().get(0).getId()),
-			() -> assertEquals(2L, orders.orElseThrow().get(0).getUser().getId()),
-			() -> assertEquals(2L, orders.orElseThrow().get(0).getShippingAddress().getId()),
-			() -> assertEquals(2L, orders.orElseThrow().get(0).getBillingAddress().getId()),
-			() -> assertEquals(new BigDecimal("49.99"), orders.orElseThrow().get(0).getTotalAmount()),
-			() -> assertEquals(3L, orders.orElseThrow().get(1).getId()),
-			() -> assertEquals(3L, orders.orElseThrow().get(1).getUser().getId()),
-			() -> assertEquals(3L, orders.orElseThrow().get(1).getShippingAddress().getId()),
-			() -> assertEquals(3L, orders.orElseThrow().get(1).getBillingAddress().getId()),
-			() -> assertEquals(new BigDecimal("89.99"), orders.orElseThrow().get(1).getTotalAmount())
-		);
-	}
-
 	@Test
 	void testFindByShippingAddressId() {
 		when(orderRepository.findByShippingAddressId(1L)).thenReturn(createListOfOrdersByShippingAddressId1());
@@ -219,8 +195,7 @@ public class OrderServiceImplTest {
 			() -> assertEquals(3L, createdOrder.orElseThrow().getShippingAddress().getId()),
 			() -> assertEquals(3L, createdOrder.orElseThrow().getBillingAddress().getId()),
 			() -> assertEquals(new BigDecimal("39.99"), createdOrder.orElseThrow().getTotalAmount()),
-			() -> assertEquals(OrderStatus.valueOf("PENDING"), createdOrder.orElseThrow().getOrderStatus()),
-			() -> assertEquals(PaymentStatus.valueOf("PENDING"), createdOrder.orElseThrow().getPaymentStatus())
+			() -> assertEquals(OrderStatus.valueOf("PENDING"), createdOrder.orElseThrow().getOrderStatus())
 		);
 	}
 
@@ -241,8 +216,7 @@ public class OrderServiceImplTest {
 			() -> assertEquals(1L, updatedOrder.orElseThrow().getShippingAddress().getId()),
 			() -> assertEquals(1L, updatedOrder.orElseThrow().getBillingAddress().getId()),
 			() -> assertEquals(new BigDecimal("119.99"), updatedOrder.orElseThrow().getTotalAmount()),
-			() -> assertEquals(OrderStatus.valueOf("PENDING"), updatedOrder.orElseThrow().getOrderStatus()),
-			() -> assertEquals(PaymentStatus.valueOf("PENDING"), updatedOrder.orElseThrow().getPaymentStatus())
+			() -> assertEquals(OrderStatus.valueOf("PENDING"), updatedOrder.orElseThrow().getOrderStatus())
 		);
 	}
 
@@ -261,28 +235,7 @@ public class OrderServiceImplTest {
 			() -> assertEquals(1L, updatedOrder.orElseThrow().getShippingAddress().getId()),
 			() -> assertEquals(1L, updatedOrder.orElseThrow().getBillingAddress().getId()),
 			() -> assertEquals(new BigDecimal("199.99"), updatedOrder.orElseThrow().getTotalAmount()),
-			() -> assertEquals(OrderStatus.valueOf("PAID"), updatedOrder.orElseThrow().getOrderStatus()),
-			() -> assertEquals(PaymentStatus.valueOf("PENDING"), updatedOrder.orElseThrow().getPaymentStatus())
-		);
-	}
-
-	@Test
-	void testUpdatePaymentStatus() {
-		when(orderRepository.findById(1L)).thenReturn(createOrder001());
-		when(orderRepository.save(any())).thenReturn(createPaymentStatusUpdateResponse());
-
-		UpdatePaymentStatusDto updatePaymentStatusDto = createPaymentStatusUpdateRequest();
-		Optional<Order> updatedOrder = orderService.updatePaymentStatus(updatePaymentStatusDto);
-
-		assertAll(
-			() -> assertTrue(updatedOrder.isPresent()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getUser().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getShippingAddress().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getBillingAddress().getId()),
-			() -> assertEquals(new BigDecimal("199.99"), updatedOrder.orElseThrow().getTotalAmount()),
-			() -> assertEquals(OrderStatus.valueOf("PENDING"), updatedOrder.orElseThrow().getOrderStatus()),
-			() -> assertEquals(PaymentStatus.valueOf("COMPLETED"), updatedOrder.orElseThrow().getPaymentStatus())
+			() -> assertEquals(OrderStatus.valueOf("PAID"), updatedOrder.orElseThrow().getOrderStatus())
 		);
 	}
 

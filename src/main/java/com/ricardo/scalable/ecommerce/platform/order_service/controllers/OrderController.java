@@ -19,10 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
-import com.ricardo.scalable.ecommerce.platform.libs_common.enums.PaymentStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
-import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.services.OrderService;
 
 import jakarta.validation.Valid;
@@ -69,22 +67,6 @@ public class OrderController {
         try {
             OrderStatus orderStatusEnum = OrderStatus.valueOf(orderStatus.toUpperCase());
             Optional<List<Order>> orderOptional = orderService.findByOrderStatus(orderStatusEnum);
-            boolean isEmpty = orderOptional.orElseThrow().isEmpty();
-            
-            if (orderOptional.isPresent() && !isEmpty) {
-                return ResponseEntity.ok(orderOptional.orElseThrow());
-            }
-            return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/payment-status/{paymentStatus}")
-    public ResponseEntity<List<Order>> getOrderByPaymentStatus(@PathVariable String paymentStatus) {
-        try {
-            PaymentStatus paymentStatusEnum = PaymentStatus.valueOf(paymentStatus.toUpperCase());
-            Optional<List<Order>> orderOptional = orderService.findByPaymentStatus(paymentStatusEnum);
             boolean isEmpty = orderOptional.orElseThrow().isEmpty();
             
             if (orderOptional.isPresent() && !isEmpty) {
@@ -166,22 +148,6 @@ public class OrderController {
             return validation(result);
         }
         Optional<Order> updatedOrderOptional = orderService.updateOrderStatus(orderStatus);
-        
-        if (updatedOrderOptional.isPresent()) {
-            return ResponseEntity.ok(updatedOrderOptional.orElseThrow());
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    @PutMapping("/payment-status")
-    public ResponseEntity<?> updatePaymentStatus(
-        @Valid @RequestBody UpdatePaymentStatusDto paymentStatus,
-        BindingResult result
-    ) {
-        if (result.hasErrors()) {
-            return validation(result);
-        }
-        Optional<Order> updatedOrderOptional = orderService.updatePaymentStatus(paymentStatus);
         
         if (updatedOrderOptional.isPresent()) {
             return ResponseEntity.ok(updatedOrderOptional.orElseThrow());

@@ -10,13 +10,11 @@ import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Address;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.User;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
-import com.ricardo.scalable.ecommerce.platform.libs_common.enums.PaymentStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.AddressRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.UserRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
-import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -51,11 +49,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Optional<List<Order>> findByPaymentStatus(PaymentStatus paymentStatus) {
-        return orderRepository.findByPaymentStatus(paymentStatus);
-    }
-
-    @Override
     public Optional<List<Order>> findByShippingAddressId(Long shippingAddressId) {
         return orderRepository.findByShippingAddressId(shippingAddressId);
     }
@@ -85,7 +78,6 @@ public class OrderServiceImpl implements OrderService {
             createdOrder.setUser(userOptional.orElseThrow());
             createdOrder.setTotalAmount(order.getTotalAmount());
             createdOrder.setOrderStatus(OrderStatus.valueOf(order.getOrderStatus().toUpperCase()));
-            createdOrder.setPaymentStatus(PaymentStatus.valueOf(order.getPaymentStatus().toUpperCase()));
             createdOrder.setShippingAddress(shippingAddressOptional.orElseThrow());
             createdOrder.setBillingAddress(billingAddressOptional.orElseThrow());
 
@@ -111,7 +103,6 @@ public class OrderServiceImpl implements OrderService {
             orderToUpdate.setUser(userOptional.orElseThrow());
             orderToUpdate.setTotalAmount(order.getTotalAmount());
             orderToUpdate.setOrderStatus(OrderStatus.valueOf(order.getOrderStatus()));
-            orderToUpdate.setPaymentStatus(PaymentStatus.valueOf(order.getPaymentStatus()));
             orderToUpdate.setShippingAddress(shippingAddressOptional.orElseThrow());
             orderToUpdate.setBillingAddress(billingAddressOptional.orElseThrow());
 
@@ -127,18 +118,6 @@ public class OrderServiceImpl implements OrderService {
         if (orderOptional.isPresent()) {
             Order orderToUpdate = orderOptional.orElseThrow();
             orderToUpdate.setOrderStatus(OrderStatus.valueOf(orderStatus.getOrderStatus()));
-            return Optional.of(orderRepository.save(orderToUpdate));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Order> updatePaymentStatus(UpdatePaymentStatusDto paymentStatus) {
-        Optional<Order> orderOptional = orderRepository.findById(paymentStatus.getOrderId());
-
-        if (orderOptional.isPresent()) {
-            Order orderToUpdate = orderOptional.orElseThrow();
-            orderToUpdate.setPaymentStatus(PaymentStatus.valueOf(paymentStatus.getPaymentStatus()));
             return Optional.of(orderRepository.save(orderToUpdate));
         }
         return Optional.empty();

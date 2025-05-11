@@ -7,7 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
-import com.ricardo.scalable.ecommerce.platform.libs_common.enums.PaymentStatus;
 
 public interface OrderRepository extends CrudRepository<Order, Long> {
 
@@ -16,8 +15,6 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
     Optional<Order> findByIdAndUserId(Long id, Long userId);
 
     Optional<List<Order>> findByOrderStatus(OrderStatus orderStatus);
-
-    Optional<List<Order>> findByPaymentStatus(PaymentStatus paymentStatus);
 
     Optional<List<Order>> findByShippingAddressId(Long shippingAddressId);
 

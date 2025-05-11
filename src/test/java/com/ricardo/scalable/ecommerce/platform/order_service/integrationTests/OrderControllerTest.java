@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
-import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdatePaymentStatusDto;
 
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -58,7 +57,6 @@ public class OrderControllerTest {
                         () -> assertEquals(1L, json.path("user").path("id").asLong()),
                         () -> assertEquals(89.99, json.path("totalAmount").asDouble()),
                         () -> assertEquals("PENDING", json.path("orderStatus").asText()),
-                        () -> assertEquals("PENDING", json.path("paymentStatus").asText()),
                         () -> assertEquals(1L, json.path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(1L, json.path("billingAddress").path("id").asLong())	
                     );
@@ -97,14 +95,12 @@ public class OrderControllerTest {
                         () -> assertEquals(1L, json.get(0).path("user").path("id").asLong()),
                         () -> assertEquals(89.99, json.get(0).path("totalAmount").asDouble()),
                         () -> assertEquals("PENDING", json.get(0).path("orderStatus").asText()),
-                        () -> assertEquals("PENDING", json.get(0).path("paymentStatus").asText()),
                         () -> assertEquals(1L, json.get(0).path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(1L, json.get(0).path("billingAddress").path("id").asLong()),
                         () -> assertEquals(2L, json.get(1).path("id").asLong()),
                         () -> assertEquals(1L, json.get(1).path("user").path("id").asLong()),
                         () -> assertEquals(49.99, json.get(1).path("totalAmount").asDouble()),
                         () -> assertEquals("PENDING", json.get(1).path("orderStatus").asText()),
-                        () -> assertEquals("COMPLETED", json.get(1).path("paymentStatus").asText()),
                         () -> assertEquals(1L, json.get(1).path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(1L, json.get(1).path("billingAddress").path("id").asLong())		
                     );
@@ -141,7 +137,6 @@ public class OrderControllerTest {
                         () -> assertEquals(2L, json.path("user").path("id").asLong()),
                         () -> assertEquals(249.99, json.path("totalAmount").asDouble()),
                         () -> assertEquals("SHIPPED", json.path("orderStatus").asText()),
-                        () -> assertEquals("COMPLETED", json.path("paymentStatus").asText()),
                         () -> assertEquals(2L, json.path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(2L, json.path("billingAddress").path("id").asLong())	
                     );
@@ -190,14 +185,12 @@ public class OrderControllerTest {
                         () -> assertEquals(2L, json.get(0).path("user").path("id").asLong()),
                         () -> assertEquals(249.99, json.get(0).path("totalAmount").asDouble()),
                         () -> assertEquals("SHIPPED", json.get(0).path("orderStatus").asText()),
-                        () -> assertEquals("COMPLETED", json.get(0).path("paymentStatus").asText()),
                         () -> assertEquals(2L, json.get(0).path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(2L, json.get(0).path("billingAddress").path("id").asLong()),
                         () -> assertEquals(5L, json.get(1).path("id").asLong()),
                         () -> assertEquals(3L, json.get(1).path("user").path("id").asLong()),
                         () -> assertEquals(49.99, json.get(1).path("totalAmount").asDouble()),
                         () -> assertEquals("SHIPPED", json.get(1).path("orderStatus").asText()),
-                        () -> assertEquals("COMPLETED", json.get(1).path("paymentStatus").asText()),
                         () -> assertEquals(3L, json.get(1).path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(3L, json.get(1).path("billingAddress").path("id").asLong())		
                     );
@@ -216,45 +209,8 @@ public class OrderControllerTest {
 			.expectStatus().isNotFound();
 	}
 
-    @Test
-	@Order(10)
-	void testGetOrderByPaymentStatus() {
-		client.get()
-			.uri("/payment-status/PENDING")
-			.exchange()
-			.expectStatus().isOk()
-			.expectHeader().contentType(MediaType.APPLICATION_JSON)
-			.expectBody()
-            .consumeWith(res -> {
-                try {
-                    JsonNode json = objectMapper.readTree(res.getResponseBody());
-                    assertAll(
-                        () -> assertNotNull(json),
-                        () -> assertTrue(json.isArray()),
-                        () -> assertEquals(2, json.size()),
-                        () -> assertEquals(1L, json.get(0).path("id").asLong()),
-                        () -> assertEquals(1L, json.get(0).path("user").path("id").asLong()),
-                        () -> assertEquals(89.99, json.get(0).path("totalAmount").asDouble()),
-                        () -> assertEquals("PENDING", json.get(0).path("orderStatus").asText()),
-                        () -> assertEquals("PENDING", json.get(0).path("paymentStatus").asText()),
-                        () -> assertEquals(1L, json.get(0).path("shippingAddress").path("id").asLong()),
-                        () -> assertEquals(1L, json.get(0).path("billingAddress").path("id").asLong()),
-                        () -> assertEquals(4L, json.get(1).path("id").asLong()),
-                        () -> assertEquals(2L, json.get(1).path("user").path("id").asLong()),
-                        () -> assertEquals(39.99, json.get(1).path("totalAmount").asDouble()),
-                        () -> assertEquals("PENDING", json.get(1).path("orderStatus").asText()),
-                        () -> assertEquals("PENDING", json.get(1).path("paymentStatus").asText()),
-                        () -> assertEquals(2L, json.get(1).path("shippingAddress").path("id").asLong()),
-                        () -> assertEquals(2L, json.get(1).path("billingAddress").path("id").asLong())		
-                    );
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-	}
-
 	@Test
-	@Order(11)
+	@Order(10)
 	void testGetOrderByPaymentStatusNotFound() {
 		client.get()
 			.uri("/payment-status/not-payed")
@@ -263,7 +219,7 @@ public class OrderControllerTest {
 	}
 
     @Test
-	@Order(12)
+	@Order(11)
 	void testGetOrderByShippingAddressId() {
 		client.get()
 			.uri("/shipping-address/3")
@@ -282,14 +238,12 @@ public class OrderControllerTest {
                         () -> assertEquals(3L, json.get(0).path("user").path("id").asLong()),
                         () -> assertEquals(49.99, json.get(0).path("totalAmount").asDouble()),
                         () -> assertEquals("SHIPPED", json.get(0).path("orderStatus").asText()),
-                        () -> assertEquals("COMPLETED", json.get(0).path("paymentStatus").asText()),
                         () -> assertEquals(3L, json.get(0).path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(3L, json.get(0).path("billingAddress").path("id").asLong()),
                         () -> assertEquals(6L, json.get(1).path("id").asLong()),
                         () -> assertEquals(3L, json.get(1).path("user").path("id").asLong()),
                         () -> assertEquals(69.99, json.get(1).path("totalAmount").asDouble()),
                         () -> assertEquals("DELIVERED", json.get(1).path("orderStatus").asText()),
-                        () -> assertEquals("COMPLETED", json.get(1).path("paymentStatus").asText()),
                         () -> assertEquals(3L, json.get(1).path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(3L, json.get(1).path("billingAddress").path("id").asLong())		
                     );
@@ -300,7 +254,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(13)
+	@Order(12)
 	void testGetOrderByShippingAddressIdNotFound() {
 		client.get()
 			.uri("/shipping-address/999")
@@ -309,7 +263,7 @@ public class OrderControllerTest {
 	}
 
     @Test
-	@Order(14)
+	@Order(13)
 	void testGetOrderByBillingAddressId() {
 		client.get()
 			.uri("/billing-address/2")
@@ -328,14 +282,12 @@ public class OrderControllerTest {
                         () -> assertEquals(2L, json.get(0).path("user").path("id").asLong()),
                         () -> assertEquals(249.99, json.get(0).path("totalAmount").asDouble()),
                         () -> assertEquals("SHIPPED", json.get(0).path("orderStatus").asText()),
-                        () -> assertEquals("COMPLETED", json.get(0).path("paymentStatus").asText()),
                         () -> assertEquals(2L, json.get(0).path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(2L, json.get(0).path("billingAddress").path("id").asLong()),
                         () -> assertEquals(4L, json.get(1).path("id").asLong()),
                         () -> assertEquals(2L, json.get(1).path("user").path("id").asLong()),
                         () -> assertEquals(39.99, json.get(1).path("totalAmount").asDouble()),
                         () -> assertEquals("PENDING", json.get(1).path("orderStatus").asText()),
-                        () -> assertEquals("PENDING", json.get(1).path("paymentStatus").asText()),
                         () -> assertEquals(2L, json.get(1).path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(2L, json.get(1).path("billingAddress").path("id").asLong())		
                     );
@@ -346,7 +298,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(15)
+	@Order(14)
 	void testGetOrderByBillingAddressIdNotFound() {
 		client.get()
 			.uri("/billing-address/999")
@@ -355,7 +307,7 @@ public class OrderControllerTest {
 	}
 
     @Test
-	@Order(16)
+	@Order(15)
 	void testGetAllOrders() {
 		client.get()
 			.uri("/")
@@ -378,7 +330,7 @@ public class OrderControllerTest {
 	}
 
     @Test
-	@Order(17)
+	@Order(16)
 	void testCreateOrder() {
 		OrderDto requestBody = createOrderCreationDto();
 		
@@ -399,7 +351,6 @@ public class OrderControllerTest {
                         () -> assertEquals(2L, json.path("user").path("id").asLong()),
                         () -> assertEquals(69.99, json.path("totalAmount").asDouble()),
                         () -> assertEquals("PENDING", json.path("orderStatus").asText()),
-                        () -> assertEquals("PENDING", json.path("paymentStatus").asText()),
                         () -> assertEquals(2L, json.path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(2L, json.path("billingAddress").path("id").asLong())	
                     );
@@ -410,7 +361,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(18)
+	@Order(17)
 	void testCreateOrderWithNoUserId() {
 		OrderDto requestBody = createOrderCreationDto();
 		requestBody.setUserId(null);
@@ -424,7 +375,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(19)
+	@Order(18)
 	void testCreateOrderWithNoShippingAddressId() {
 		OrderDto requestBody = createOrderCreationDto();
 		requestBody.setShippingAddressId(null);
@@ -438,7 +389,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(20)
+	@Order(19)
 	void testCreateOrderWithNoBillingAddressId() {
 		OrderDto requestBody = createOrderCreationDto();
 		requestBody.setBillingAddressId(null);
@@ -452,7 +403,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(21)
+	@Order(20)
 	void testCreateOrderNotFoundUserId() {
 		OrderDto requestBody = createOrderCreationDto();
 		requestBody.setUserId(999L);
@@ -466,7 +417,7 @@ public class OrderControllerTest {
 	}
 	
 	@Test
-	@Order(22)
+	@Order(21)
 	void testCreateOrderNotFoundShippingAddressId() {
 		OrderDto requestBody = createOrderCreationDto();
 		requestBody.setShippingAddressId(999L);
@@ -480,7 +431,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(23)
+	@Order(22)
 	void testCreateOrderNotFoundBillingAddressId() {
 		OrderDto requestBody = createOrderCreationDto();
 		requestBody.setBillingAddressId(999L);
@@ -494,7 +445,7 @@ public class OrderControllerTest {
 	}
 
     @Test
-	@Order(24)
+	@Order(23)
 	void testUpdateOrder() {
 		OrderDto requestBody = createOrderUpdateDto();
 		
@@ -515,7 +466,6 @@ public class OrderControllerTest {
                         () -> assertEquals(2L, json.path("user").path("id").asLong()),
                         () -> assertEquals(89.99, json.path("totalAmount").asDouble()),
                         () -> assertEquals("PENDING", json.path("orderStatus").asText()),
-                        () -> assertEquals("PENDING", json.path("paymentStatus").asText()),
                         () -> assertEquals(2L, json.path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(2L, json.path("billingAddress").path("id").asLong())	
                     );
@@ -526,7 +476,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(25)
+	@Order(24)
 	void testUpdateOrderWithNoUserId() {
 		OrderDto requestBody = createOrderUpdateDto();
 		requestBody.setUserId(null);
@@ -540,7 +490,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(26)
+	@Order(25)
 	void testUpdateOrderWithNoShippingAddressId() {
 		OrderDto requestBody = createOrderUpdateDto();
 		requestBody.setShippingAddressId(null);
@@ -554,7 +504,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(27)
+	@Order(26)
 	void testUpdateOrderWithNoBillingAddressId() {
 		OrderDto requestBody = createOrderUpdateDto();
 		requestBody.setBillingAddressId(null);
@@ -568,7 +518,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(28)
+	@Order(27)
 	void testUpdateOrderNotFound() {
 		OrderDto requestBody = createOrderUpdateDto();
 		
@@ -581,7 +531,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(29)
+	@Order(28)
 	void testUpdateOrderNotFoundUserId() {
 		OrderDto requestBody = createOrderUpdateDto();
 		requestBody.setUserId(999L);
@@ -595,7 +545,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(30)
+	@Order(29)
 	void testUpdateOrderNotFoundShippingAddressId() {
 		OrderDto requestBody = createOrderUpdateDto();
 		requestBody.setShippingAddressId(999L);
@@ -609,7 +559,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(31)
+	@Order(30)
 	void testUpdateOrderNotFoundBillingAddressId() {
 		OrderDto requestBody = createOrderUpdateDto();
 		requestBody.setBillingAddressId(999L);
@@ -623,7 +573,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(32)
+	@Order(31)
 	void testUpdateOrderStatus() {
 		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
 		
@@ -644,7 +594,6 @@ public class OrderControllerTest {
 						() -> assertEquals(1L, json.path("user").path("id").asLong()),
 						() -> assertEquals(49.99, json.path("totalAmount").asDouble()),
 						() -> assertEquals("SHIPPED", json.path("orderStatus").asText()),
-						() -> assertEquals("COMPLETED", json.path("paymentStatus").asText()),
 						() -> assertEquals(1L, json.path("shippingAddress").path("id").asLong()),
 						() -> assertEquals(1L, json.path("billingAddress").path("id").asLong())	
 					);
@@ -655,7 +604,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(33)
+	@Order(32)
 	void testUpdateOrderStatusWithNoOrderId() {
 		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
 		requestBody.setOrderId(null);
@@ -669,7 +618,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(34)
+	@Order(33)
 	void testUpdateOrderStatusWithNoOrderStatus() {
 		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
 		requestBody.setOrderStatus(null);
@@ -683,7 +632,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(35)
+	@Order(34)
 	void testUpdateOrderStatusNotFound() {
 		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
 		requestBody.setOrderId(999L);
@@ -697,81 +646,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(36)
-	void testUpdatePaymentStatus() {
-		UpdatePaymentStatusDto requestBody = createUpdatePaymentStatusDto();
-		
-		client.put()
-			.uri("/payment-status")
-			.contentType(MediaType.APPLICATION_JSON)
-			.bodyValue(requestBody)
-			.exchange()
-			.expectStatus().isOk()
-			.expectHeader().contentType(MediaType.APPLICATION_JSON)
-			.expectBody()
-			.consumeWith(res -> {
-				try {
-					JsonNode json = objectMapper.readTree(res.getResponseBody());
-					assertAll(
-						() -> assertNotNull(json),
-						() -> assertEquals(1L, json.path("id").asLong()),
-						() -> assertEquals(1L, json.path("user").path("id").asLong()),
-						() -> assertEquals(89.99, json.path("totalAmount").asDouble()),
-						() -> assertEquals("PENDING", json.path("orderStatus").asText()),
-						() -> assertEquals("COMPLETED", json.path("paymentStatus").asText()),
-						() -> assertEquals(1L, json.path("shippingAddress").path("id").asLong()),
-						() -> assertEquals(1L, json.path("billingAddress").path("id").asLong())	
-					);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			});
-	}
-
-	@Test
-	@Order(37)
-	void testUpdatePaymentStatusWithNoOrderId() {
-		UpdatePaymentStatusDto requestBody = createUpdatePaymentStatusDto();
-		requestBody.setOrderId(null);
-		
-		client.put()
-			.uri("/payment-status")
-			.contentType(MediaType.APPLICATION_JSON)
-			.bodyValue(requestBody)
-			.exchange()
-			.expectStatus().isBadRequest();
-	}
-
-	@Test
-	@Order(38)
-	void testUpdatePaymentStatusWithNoPaymentStatus() {
-		UpdatePaymentStatusDto requestBody = createUpdatePaymentStatusDto();
-		requestBody.setPaymentStatus(null);
-		
-		client.put()
-			.uri("/payment-status")
-			.contentType(MediaType.APPLICATION_JSON)
-			.bodyValue(requestBody)
-			.exchange()
-			.expectStatus().isBadRequest();
-	}
-
-	@Test
-	@Order(39)
-	void testUpdatePaymentStatusNotFound() {
-		UpdatePaymentStatusDto requestBody = createUpdatePaymentStatusDto();
-		requestBody.setOrderId(999L);
-		
-		client.put()
-			.uri("/payment-status")
-			.contentType(MediaType.APPLICATION_JSON)
-			.bodyValue(requestBody)
-			.exchange()
-			.expectStatus().isNotFound();
-	}
-
-	@Test
-	@Order(40)
+	@Order(35)
 	void testDeleteOrder() {	
 		client.delete()
 			.uri("/7")
@@ -799,7 +674,7 @@ public class OrderControllerTest {
 	}
 	
 	@Test
-	@Order(41)
+	@Order(36)
 	void testGetDeletedOrder() {	
 		client.get()
 			.uri("/7")

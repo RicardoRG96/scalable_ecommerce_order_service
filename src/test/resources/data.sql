@@ -219,23 +219,23 @@ INSERT INTO discount_product_sku (discount_id, product_sku_id)
 
 -- ORDERS
 
-INSERT INTO orders (user_id, total_amount, order_status, payment_status, shipping_address_id, billing_address_id)
-    VALUES (1, 89.99, 'PENDING', 'PENDING', 1, 1);
+INSERT INTO orders (user_id, total_amount, order_status, shipping_address_id, billing_address_id)
+    VALUES (1, 89.99, 'PENDING', 1, 1);
 
-INSERT INTO orders (user_id, total_amount, order_status, payment_status, shipping_address_id, billing_address_id)
-    VALUES (1, 49.99, 'PENDING', 'COMPLETED', 1, 1);
+INSERT INTO orders (user_id, total_amount, order_status, shipping_address_id, billing_address_id)
+    VALUES (1, 49.99, 'PENDING', 1, 1);
 
-INSERT INTO orders (user_id, total_amount, order_status, payment_status, shipping_address_id, billing_address_id)
-    VALUES (2, 249.99, 'SHIPPED', 'COMPLETED', 2, 2);
+INSERT INTO orders (user_id, total_amount, order_status, shipping_address_id, billing_address_id)
+    VALUES (2, 249.99, 'SHIPPED', 2, 2);
 
-INSERT INTO orders (user_id, total_amount, order_status, payment_status, shipping_address_id, billing_address_id)
-    VALUES (2, 39.99, 'PENDING', 'PENDING', 2, 2);
+INSERT INTO orders (user_id, total_amount, order_status, shipping_address_id, billing_address_id)
+    VALUES (2, 39.99, 'PENDING', 2, 2);
 
-INSERT INTO orders (user_id, total_amount, order_status, payment_status, shipping_address_id, billing_address_id)
-    VALUES (3, 49.99, 'SHIPPED', 'COMPLETED', 3, 3);
+INSERT INTO orders (user_id, total_amount, order_status, shipping_address_id, billing_address_id)
+    VALUES (3, 49.99, 'SHIPPED', 3, 3);
 
-INSERT INTO orders (user_id, total_amount, order_status, payment_status, shipping_address_id, billing_address_id)
-    VALUES (3, 69.99, 'DELIVERED', 'COMPLETED', 3, 3);
+INSERT INTO orders (user_id, total_amount, order_status, shipping_address_id, billing_address_id)
+    VALUES (3, 69.99, 'DELIVERED', 3, 3);
 
 
 -- ORDER_ITEMS

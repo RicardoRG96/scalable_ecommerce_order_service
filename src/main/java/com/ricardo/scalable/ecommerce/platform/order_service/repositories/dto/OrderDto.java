@@ -18,9 +18,6 @@ public class OrderDto {
     @NotBlank
     private String orderStatus;
 
-    @NotBlank
-    private String paymentStatus;
-
     @NotNull
     @Min(1)
     private Long shippingAddressId;
@@ -32,12 +29,11 @@ public class OrderDto {
     public OrderDto() {
     }
 
-    public OrderDto(Long userId, BigDecimal totalAmount, String orderStatus, String paymentStatus,
+    public OrderDto(Long userId, BigDecimal totalAmount, String orderStatus,
             Long shippingAddressId, Long billingAddressId) {
         this.userId = userId;
         this.totalAmount = totalAmount;
         this.orderStatus = orderStatus;
-        this.paymentStatus = paymentStatus;
         this.shippingAddressId = shippingAddressId;
         this.billingAddressId = billingAddressId;
     }
@@ -64,14 +60,6 @@ public class OrderDto {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
-    }
-
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
     }
 
     public Long getShippingAddressId() {
