@@ -424,8 +424,62 @@ public class OrderItemControllerTest {
 			.expectStatus().isNotFound();
 	}
 
-    @Test
+	@Test
 	@Order(21)
+	void createOrderItem_whenProductSkuHasInsufficientStock_shouldReturn400AndErrorMessage() {
+		OrderItemDto requestBody = createOrderItemCreationDto();
+		requestBody.setQuantity(960); // set a quantity greater than available stock
+
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals("Insufficient stock", json.path("error").asText()),
+						() -> assertEquals("Not enough stock for product SKU: 3", json.path("message").asText())
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+	@Test
+	@Order(22)
+	void createOrderItem_whenProductSkuDoesNotExist_shouldReturn404AndErrorMessage() {
+		OrderItemDto requestBody = createOrderItemCreationDto();
+		requestBody.setProductSkuId(999L); // set a non-existing product SKU ID
+
+		client.post()
+			.uri("/order-items")
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound()
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals("Resource not found", json.path("error").asText()),
+						() -> assertEquals("Product SKU not found: 999", json.path("message").asText())
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+    @Test
+	@Order(23)
 	void testUpdateOrderItem() {
 		OrderItemDto requestBody = createOrderItemUpdateDto();
 			
@@ -456,7 +510,7 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(22)
+	@Order(24)
 	void testUpdateOrderItemWithNoOrderId() {
 		OrderItemDto requestBody = createOrderItemUpdateDto();
 		requestBody.setOrderId(null);
@@ -470,7 +524,7 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(23)
+	@Order(25)
 	void testUpdateOrderItemWithNoProductSkuId() {
 		OrderItemDto requestBody = createOrderItemUpdateDto();
 		requestBody.setProductSkuId(null);
@@ -484,7 +538,7 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(24)
+	@Order(26)
 	void testUpdateOrderItemWithNoDiscountId() {
 		OrderItemDto requestBody = createOrderItemUpdateDto();
 		requestBody.setDiscountId(null);
@@ -498,7 +552,7 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(25)
+	@Order(27)
 	void testUpdateOrderItemNotFound() {
 		OrderItemDto requestBody = createOrderItemUpdateDto();
 			
@@ -511,7 +565,7 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(26)
+	@Order(28)
 	void testUpdateOrderItemNotFoundOrderId() {
 		OrderItemDto requestBody = createOrderItemUpdateDto();
 		requestBody.setOrderId(999L);
@@ -525,7 +579,7 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(27)
+	@Order(29)
 	void testUpdateOrderItemNotFoundProductSkuId() {
 		OrderItemDto requestBody = createOrderItemUpdateDto();
 		requestBody.setProductSkuId(999L);
@@ -539,7 +593,7 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(28)
+	@Order(30)
 	void testUpdateOrderItemNotFoundDiscountId() {
 		OrderItemDto requestBody = createOrderItemUpdateDto();
 		requestBody.setDiscountId(999L);
@@ -553,7 +607,61 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(29)
+	@Order(31)
+	void updateOrderItem_whenProductSkuHasInsufficientStock_shouldReturn400AndErrorMessage() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+		requestBody.setQuantity(960); // set a quantity greater than available stock
+
+		client.put()
+			.uri("/order-items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals("Insufficient stock", json.path("error").asText()),
+						() -> assertEquals("Not enough stock for product SKU: 3", json.path("message").asText())
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+	@Test
+	@Order(32)
+	void updateOrderItem_whenProductSkuDoesNotExist_shouldReturn404AndErrorMessage() {
+		OrderItemDto requestBody = createOrderItemUpdateDto();
+		requestBody.setProductSkuId(999L); // set a non-existing product SKU ID
+
+		client.put()
+			.uri("/order-items/1")
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(requestBody)
+			.exchange()
+			.expectStatus().isNotFound()
+			.expectBody()
+			.consumeWith(res -> {
+				try {
+					JsonNode json = objectMapper.readTree(res.getResponseBody());
+					assertAll(
+						() -> assertNotNull(json),
+						() -> assertEquals("Resource not found", json.path("error").asText()),
+						() -> assertEquals("Product SKU not found: 999", json.path("message").asText())
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+	}
+
+	@Test
+	@Order(33)
 	void testDeleteOrderItem() {	
 		client.delete()
 			.uri("/order-items/9")
@@ -581,7 +689,7 @@ public class OrderItemControllerTest {
 	}
 
 	@Test
-	@Order(30)
+	@Order(34)
 	void testGetDeletedOrderItem() {	
 		client.get()
 			.uri("/order-items/9")
