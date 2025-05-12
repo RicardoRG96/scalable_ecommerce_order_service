@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderItemDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.services.OrderItemService;
+import com.ricardo.scalable.ecommerce.platform.order_service.services.StockService;
 
 import jakarta.validation.Valid;
 
@@ -29,6 +30,9 @@ public class OrderItemController {
 
     @Autowired
     private OrderItemService orderItemService;
+
+    @Autowired
+    private StockService stockService;
 
     @GetMapping("/order-items/{id}")
     public ResponseEntity<OrderItem> getOrderItemById(@PathVariable Long id) {
@@ -111,6 +115,7 @@ public class OrderItemController {
         if (result.hasErrors()) {
             return validation(result);
         }
+        stockService.verifyStock(orderItem);
         Optional<OrderItem> createdOrderItem = orderItemService.save(orderItem);
         
         if (createdOrderItem.isPresent()) {
@@ -128,6 +133,7 @@ public class OrderItemController {
         if (result.hasErrors()) {
             return validation(result);
         }
+        stockService.verifyStock(orderItem);
         Optional<OrderItem> updatedOrderItem = orderItemService.update(id, orderItem);
         
         if (updatedOrderItem.isPresent()) {
