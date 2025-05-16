@@ -3,11 +3,11 @@ package com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public class OrderDto {
+public class UpdateOrderAddressesDto {
 
     @NotNull
     @Min(1)
-    private Long userId;
+    private Long orderId;
 
     @NotNull
     @Min(1)
@@ -17,22 +17,21 @@ public class OrderDto {
     @Min(1)
     private Long billingAddressId;
 
-    public OrderDto() {
+    public UpdateOrderAddressesDto() {
     }
 
-    public OrderDto(Long userId,
-            Long shippingAddressId, Long billingAddressId) {
-        this.userId = userId;
+    public UpdateOrderAddressesDto(Long orderId, Long shippingAddressId, Long billingAddressId) {
+        this.orderId = orderId;
         this.shippingAddressId = shippingAddressId;
         this.billingAddressId = billingAddressId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public Long getShippingAddressId() {
@@ -49,6 +48,12 @@ public class OrderDto {
 
     public void setBillingAddressId(Long billingAddressId) {
         this.billingAddressId = billingAddressId;
+    }
+
+    @Override
+    public String toString() {
+        return "UpdateOrderAddressesDto [orderId=" + orderId + ", shippingAddressId=" + shippingAddressId
+                + ", billingAddressId=" + billingAddressId + "]";
     }
 
 }

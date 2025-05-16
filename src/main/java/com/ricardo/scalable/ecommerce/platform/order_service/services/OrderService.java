@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderAddressesDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 
 public interface OrderService {
@@ -24,11 +25,11 @@ public interface OrderService {
 
     List<Order> findAll();
 
-    Optional<Order> save(OrderDto order);
+    Order createOrderFromCart(OrderDto order);
 
-    Optional<Order> update(Long id, OrderDto order);
+    Order updateOrderAddresses(UpdateOrderAddressesDto orderAddresses);
 
-    Optional<Order> updateOrderStatus(UpdateOrderStatusDto orderStatus);
+    Order updateOrderStatus(UpdateOrderStatusDto orderStatus);
 
     void delete(Long id);
 

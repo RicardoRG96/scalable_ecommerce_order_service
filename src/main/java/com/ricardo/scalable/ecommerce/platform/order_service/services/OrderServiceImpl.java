@@ -1,5 +1,6 @@
 package com.ricardo.scalable.ecommerce.platform.order_service.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,14 +8,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Address;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Cart;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.CartItem;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.ProductSku;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.User;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.AddressNotFoundException;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.CartNotFoundException;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.InsufficientStockException;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.OrderNotFoundException;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.UserNotFoundException;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.AddressRepository;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.CartItemRepository;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.CartRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.ProductSkuRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.UserRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderAddressesDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -27,6 +43,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private ProductSkuRepository productSkuRepository;
 
     @Override
     public Optional<Order> findById(Long id) {
@@ -64,63 +89,92 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Optional<Order> save(OrderDto order) {
-        Optional<User> userOptional = userRepository.findById(order.getUserId());
-        Optional<Address> shippingAddressOptional = addressRepository.findById(order.getShippingAddressId());
-        Optional<Address> billingAddressOptional = addressRepository.findById(order.getBillingAddressId());
+    @Transactional
+    public Order createOrderFromCart(OrderDto orderDto) {
+        User user = userRepository.findById(orderDto.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (
-            userOptional.isPresent() && 
-            shippingAddressOptional.isPresent() && 
-            billingAddressOptional.isPresent()
-        ) {
-            Order createdOrder = new Order();
-            createdOrder.setUser(userOptional.orElseThrow());
-            createdOrder.setTotalAmount(order.getTotalAmount());
-            createdOrder.setOrderStatus(OrderStatus.valueOf(order.getOrderStatus().toUpperCase()));
-            createdOrder.setShippingAddress(shippingAddressOptional.orElseThrow());
-            createdOrder.setBillingAddress(billingAddressOptional.orElseThrow());
+        Address shippingAddress = addressRepository.findById(orderDto.getShippingAddressId())
+                .orElseThrow(() -> new AddressNotFoundException("Shipping address not found"));
+                
+        Address billingAddress = addressRepository.findById(orderDto.getBillingAddressId())
+                .orElseThrow(() -> new AddressNotFoundException("Billing address not found"));
 
-            return Optional.of(orderRepository.save(createdOrder));
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new CartNotFoundException("Cart not found for user"));
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setTotalAmount(calculateTotalAmount(cart));
+        order.setOrderStatus(OrderStatus.PENDING);
+        order.setShippingAddress(shippingAddress);
+        order.setBillingAddress(billingAddress);
+
+        order = orderRepository.save(order);
+
+        setCartItemsToOrderItems(cart, order);
+        clearCart(cart);
+
+        return orderRepository.save(order);
+    }
+
+    private BigDecimal calculateTotalAmount(Cart cart) {
+        double totalAmount = cart.getItems().stream()
+                .mapToDouble(
+                    item -> productSkuRepository.findById(item.getProductSku().getId())
+                            .map(productSku -> productSku.getPrice() * item.getQuantity())
+                            .orElse(0.0)
+                )
+                .sum();
+        return BigDecimal.valueOf(totalAmount);
+    }
+
+    private void setCartItemsToOrderItems(Cart cart, Order order) {
+        for (CartItem item : cart.getItems()) {
+            ProductSku productSku = item.getProductSku();
+            if (productSku.getStock() < item.getQuantity()) {
+                throw new InsufficientStockException("Not enough stock for product: " + productSku.getId());
+            }
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProductSku(productSku);
+            orderItem.setQuantity(item.getQuantity());
+            orderItem.setUnitPrice(BigDecimal.valueOf(productSku.getPrice()));
+            order.getItems().add(orderItem);
         }
-        return Optional.empty();
+    }
+
+    private void clearCart(Cart cart) {
+        cartRepository.delete(cart);
     }
 
     @Override
-    public Optional<Order> update(Long id, OrderDto order) {
-        Optional<Order> orderOptional = orderRepository.findById(id);
-        Optional<User> userOptional = userRepository.findById(order.getUserId());
-        Optional<Address> shippingAddressOptional = addressRepository.findById(order.getShippingAddressId());
-        Optional<Address> billingAddressOptional = addressRepository.findById(order.getBillingAddressId());
+    @Transactional
+    public Order updateOrderAddresses(UpdateOrderAddressesDto orderAddresses) {
+        Order orderToUpdate = orderRepository.findById(orderAddresses.getOrderId())
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if (
-            orderOptional.isPresent() && 
-            userOptional.isPresent() && 
-            shippingAddressOptional.isPresent() && 
-            billingAddressOptional.isPresent()
-        ) {
-            Order orderToUpdate = orderOptional.orElseThrow();
-            orderToUpdate.setUser(userOptional.orElseThrow());
-            orderToUpdate.setTotalAmount(order.getTotalAmount());
-            orderToUpdate.setOrderStatus(OrderStatus.valueOf(order.getOrderStatus()));
-            orderToUpdate.setShippingAddress(shippingAddressOptional.orElseThrow());
-            orderToUpdate.setBillingAddress(billingAddressOptional.orElseThrow());
+        Address shippingAddress = addressRepository.findById(orderAddresses.getShippingAddressId())
+                .orElseThrow(() -> new AddressNotFoundException("Shipping address not found"));
 
-            return Optional.of(orderRepository.save(orderToUpdate));
-        }
-        return Optional.empty();
+        Address billingAddress = addressRepository.findById(orderAddresses.getBillingAddressId())
+                .orElseThrow(() -> new AddressNotFoundException("Billing address not found"));
+
+        orderToUpdate.setShippingAddress(shippingAddress);
+        orderToUpdate.setBillingAddress(billingAddress);
+        return orderRepository.save(orderToUpdate);
     }
 
     @Override
-    public Optional<Order> updateOrderStatus(UpdateOrderStatusDto orderStatus) {
-        Optional<Order> orderOptional = orderRepository.findById(orderStatus.getOrderId());
+    @Transactional
+    public Order updateOrderStatus(UpdateOrderStatusDto orderStatus) {
+        Order orderToUpdate = orderRepository.findById(orderStatus.getOrderId())
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if (orderOptional.isPresent()) {
-            Order orderToUpdate = orderOptional.orElseThrow();
-            orderToUpdate.setOrderStatus(OrderStatus.valueOf(orderStatus.getOrderStatus()));
-            return Optional.of(orderRepository.save(orderToUpdate));
-        }
-        return Optional.empty();
+        orderToUpdate.setOrderStatus(OrderStatus.valueOf(orderStatus.getOrderStatus()));
+        return orderRepository.save(orderToUpdate);
+
     }
 
     @Override

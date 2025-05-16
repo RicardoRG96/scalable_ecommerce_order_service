@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderAddressesDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.services.OrderService;
 
@@ -114,29 +115,22 @@ public class OrderController {
         if (result.hasErrors()) {
             return validation(result);
         }
-        Optional<Order> createdOrderOptional = orderService.save(order);
-        
-        if (createdOrderOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdOrderOptional.orElseThrow());
-        }
-        return ResponseEntity.notFound().build();
+        Order createdOrder = orderService.createOrderFromCart(order);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOrder(
-        @Valid @RequestBody OrderDto order,
+    public ResponseEntity<?> updateOrderAddress(
+        @Valid @RequestBody UpdateOrderAddressesDto orderAddressDto,
         @PathVariable Long id,
         BindingResult result
     ) {
         if (result.hasErrors()) {
             return validation(result);
         }
-        Optional<Order> updatedOrderOptional = orderService.update(id, order);
-        
-        if (updatedOrderOptional.isPresent()) {
-            return ResponseEntity.ok(updatedOrderOptional.orElseThrow());
-        }
-        return ResponseEntity.notFound().build();
+        Order updatedOrderOptional = orderService.updateOrderAddresses(orderAddressDto);
+
+        return ResponseEntity.ok(updatedOrderOptional);        
     }
 
     @PutMapping("/status")
@@ -147,12 +141,9 @@ public class OrderController {
         if (result.hasErrors()) {
             return validation(result);
         }
-        Optional<Order> updatedOrderOptional = orderService.updateOrderStatus(orderStatus);
-        
-        if (updatedOrderOptional.isPresent()) {
-            return ResponseEntity.ok(updatedOrderOptional.orElseThrow());
-        }
-        return ResponseEntity.notFound().build();
+        Order updatedOrderOptional = orderService.updateOrderStatus(orderStatus);
+
+        return ResponseEntity.ok(updatedOrderOptional);
     }
 
     @DeleteMapping("/{id}")
