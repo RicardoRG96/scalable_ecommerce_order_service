@@ -1,6 +1,8 @@
 package com.ricardo.scalable.ecommerce.platform.order_service.services;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Address;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Cart;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.CartItem;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Discount;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.ProductSku;
@@ -23,6 +26,7 @@ import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.UserNotFou
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.AddressRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.CartItemRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.CartRepository;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.DiscountRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.ProductSkuRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.UserRepository;
@@ -52,6 +56,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ProductSkuRepository productSkuRepository;
+
+    @Autowired
+    private DiscountRepository discountRepository;
 
     @Override
     public Optional<Order> findById(Long id) {
@@ -119,14 +126,33 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private BigDecimal calculateTotalAmount(Cart cart) {
-        double totalAmount = cart.getItems().stream()
+        double totalAmount = cart.getItems()
+                .stream()
                 .mapToDouble(
                     item -> productSkuRepository.findById(item.getProductSku().getId())
-                            .map(productSku -> productSku.getPrice() * item.getQuantity())
+                            .map(productSku -> {
+                                BigDecimal priceToUse = BigDecimal.valueOf(productSku.getPrice());
+                                Optional<Discount> discount = findActiveDiscountByProductSkuId(productSku.getId());
+                                if (discount.isPresent()) {
+                                    Discount activeDiscount = discount.orElseThrow();
+                                    priceToUse = applyDiscount(priceToUse, activeDiscount);
+                                }
+                                return priceToUse.multiply(BigDecimal.valueOf(item.getQuantity()))
+                                        .setScale(0, RoundingMode.HALF_UP)
+                                        .doubleValue();
+                            })
                             .orElse(0.0)
                 )
                 .sum();
         return BigDecimal.valueOf(totalAmount);
+    }
+
+    private Optional<Discount> findActiveDiscountByProductSkuId(Long productSkuId) {
+        return discountRepository.findActiveDiscountByProductSkuId(productSkuId, LocalDateTime.now());
+    }
+
+    private BigDecimal applyDiscount(BigDecimal price, Discount discount) {
+        return discount.getDiscountType().apply(price, BigDecimal.valueOf(discount.getDiscountValue()));
     }
 
     private void setCartItemsToOrderItems(Cart cart, Order order) {
@@ -137,10 +163,16 @@ public class OrderServiceImpl implements OrderService {
             }
 
             OrderItem orderItem = new OrderItem();
+            Discount discount = findActiveDiscountByProductSkuId(productSku.getId()).orElse(null);
+            BigDecimal unitPriceToUse = BigDecimal.valueOf(productSku.getPrice());
+            if (discount != null) {
+                unitPriceToUse = applyDiscount(unitPriceToUse, discount);
+            }
             orderItem.setOrder(order);
             orderItem.setProductSku(productSku);
             orderItem.setQuantity(item.getQuantity());
-            orderItem.setUnitPrice(BigDecimal.valueOf(productSku.getPrice()));
+            orderItem.setUnitPrice(unitPriceToUse);
+            orderItem.setDiscount(discount);
             order.getItems().add(orderItem);
         }
     }
