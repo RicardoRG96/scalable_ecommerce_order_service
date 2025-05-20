@@ -8,8 +8,6 @@ import com.ricardo.scalable.ecommerce.platform.libs_common.entities.CartItem;
 
 public interface CartItemRepository extends CrudRepository<CartItem, Long> {
 
-    List<CartItem> findByUserId(Long userId);
-
     List<CartItem> findByCartId(Long cartId);
 
 }

@@ -11,6 +11,7 @@ import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.User;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderAddressesDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.AddressTestData.*;
@@ -171,23 +172,8 @@ public class OrderServiceImplTestData {
 	public static OrderDto createOrderDtoCreationRequest() {
 		OrderDto orderDto = new OrderDto();
 		orderDto.setUserId(3L);
-		orderDto.setTotalAmount(new BigDecimal("39.99"));
-		orderDto.setOrderStatus("PENDING");
 		orderDto.setShippingAddressId(3L);
 		orderDto.setBillingAddressId(3L);
-
-		return orderDto;	
-	}
-
-	public static OrderDto createOrderDtoUpdateRequest() {
-		// ACTUALIZA EL ORDER CON ID 1
-		// CAMBIA EL TOTAL AMOUNT
-		OrderDto orderDto = new OrderDto();
-		orderDto.setUserId(1L);
-		orderDto.setTotalAmount(new BigDecimal("119.99"));
-		orderDto.setOrderStatus("PENDING");
-		orderDto.setShippingAddressId(1L);
-		orderDto.setBillingAddressId(1L);
 
 		return orderDto;	
 	}
@@ -210,9 +196,19 @@ public class OrderServiceImplTestData {
 		return order;
 	}
 
-	public static Order createOrderUpdateResponse() {
+	public static UpdateOrderAddressesDto createOrderAddressUpdateRequest() {
+		UpdateOrderAddressesDto updateOrderAddresses = new UpdateOrderAddressesDto();
+		updateOrderAddresses.setOrderId(1L);
+		updateOrderAddresses.setShippingAddressId(2L);
+		updateOrderAddresses.setBillingAddressId(2L);
+
+		return updateOrderAddresses;
+	}
+
+	public static Order createOrderAddressUpdateResponse() {
 		Order order = createOrder001().orElseThrow();
-		order.setTotalAmount(new BigDecimal("119.99"));
+		order.setShippingAddress(createAddress002().orElseThrow());
+		order.setBillingAddress(createAddress002().orElseThrow());
 
 		return order;
 	}

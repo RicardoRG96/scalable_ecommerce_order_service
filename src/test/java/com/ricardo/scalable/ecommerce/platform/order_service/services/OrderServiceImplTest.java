@@ -15,10 +15,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.OrderNotFoundException;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.AddressRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.UserRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderAddressesDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.OrderServiceImplTestData.*;
@@ -186,38 +188,48 @@ public class OrderServiceImplTest {
 		when(orderRepository.save(any())).thenReturn(createOrderCreationResponse());
 
 		OrderDto orderDto = createOrderDtoCreationRequest();
-		Optional<Order> createdOrder = orderService.save(orderDto);
+		Order createdOrder = orderService.createOrderFromCart(orderDto);
 
 		assertAll(
-			() -> assertTrue(createdOrder.isPresent()),
-			() -> assertEquals(6L, createdOrder.orElseThrow().getId()),
-			() -> assertEquals(3L, createdOrder.orElseThrow().getUser().getId()),
-			() -> assertEquals(3L, createdOrder.orElseThrow().getShippingAddress().getId()),
-			() -> assertEquals(3L, createdOrder.orElseThrow().getBillingAddress().getId()),
-			() -> assertEquals(new BigDecimal("39.99"), createdOrder.orElseThrow().getTotalAmount()),
-			() -> assertEquals(OrderStatus.valueOf("PENDING"), createdOrder.orElseThrow().getOrderStatus())
+			() -> assertNotNull(createdOrder),
+			() -> assertEquals(6L, createdOrder.getId()),
+			() -> assertEquals(3L, createdOrder.getUser().getId()),
+			() -> assertEquals(3L, createdOrder.getShippingAddress().getId()),
+			() -> assertEquals(3L, createdOrder.getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("39.99"), createdOrder.getTotalAmount()),
+			() -> assertEquals(OrderStatus.valueOf("PENDING"), createdOrder.getOrderStatus())
 		);
 	}
 
 	@Test
-	void testUpdate() {
+	void updateOrderAddress_whenOrderAndAddressExist_thenUpdateOrderAddress() {
 		when(orderRepository.findById(1L)).thenReturn(createOrder001());
-		when(userRepository.findById(1L)).thenReturn(createUser001());
-		when(addressRepository.findById(1L)).thenReturn(createAddress001());
-		when(orderRepository.save(any())).thenReturn(createOrderUpdateResponse());
+		when(addressRepository.findById(2L)).thenReturn(createAddress002());
+		when(orderRepository.save(any())).thenReturn(createOrderAddressUpdateResponse());
 
-		OrderDto orderDto = createOrderDtoUpdateRequest();
-		Optional<Order> updatedOrder = orderService.update(1L, orderDto);
+		UpdateOrderAddressesDto updateOrderAddresses = createOrderAddressUpdateRequest();
+		Order updatedOrder = orderService.updateOrderAddresses(updateOrderAddresses);
 
 		assertAll(
-			() -> assertTrue(updatedOrder.isPresent()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getUser().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getShippingAddress().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getBillingAddress().getId()),
-			() -> assertEquals(new BigDecimal("119.99"), updatedOrder.orElseThrow().getTotalAmount()),
-			() -> assertEquals(OrderStatus.valueOf("PENDING"), updatedOrder.orElseThrow().getOrderStatus())
+			() -> assertNotNull(updatedOrder),
+			() -> assertEquals(1L, updatedOrder.getId()),
+			() -> assertEquals(1L, updatedOrder.getUser().getId()),
+			() -> assertEquals(2L, updatedOrder.getShippingAddress().getId()),
+			() -> assertEquals(2L, updatedOrder.getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("199.99"), updatedOrder.getTotalAmount())
 		);
+	}
+
+	@Test
+	void testUpdateOrderAddress_whenOrderDoesNotExist_thenThrowException() {
+		when(orderRepository.findById(100L)).thenReturn(Optional.empty());
+
+		UpdateOrderAddressesDto updateOrderAddresses = createOrderAddressUpdateRequest();
+		updateOrderAddresses.setOrderId(100L);
+		
+		assertThrows(OrderNotFoundException.class, () -> {
+			orderService.updateOrderAddresses(updateOrderAddresses);
+		});
 	}
 
     @Test
@@ -226,16 +238,16 @@ public class OrderServiceImplTest {
 		when(orderRepository.save(any())).thenReturn(createOrderStatusUpdateResponse());
 
 		UpdateOrderStatusDto updateOrderStatusDto = createOrderStatusUpdateRequest();
-		Optional<Order> updatedOrder = orderService.updateOrderStatus(updateOrderStatusDto);
+		Order updatedOrder = orderService.updateOrderStatus(updateOrderStatusDto);
 
 		assertAll(
-			() -> assertTrue(updatedOrder.isPresent()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getUser().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getShippingAddress().getId()),
-			() -> assertEquals(1L, updatedOrder.orElseThrow().getBillingAddress().getId()),
-			() -> assertEquals(new BigDecimal("199.99"), updatedOrder.orElseThrow().getTotalAmount()),
-			() -> assertEquals(OrderStatus.valueOf("PAID"), updatedOrder.orElseThrow().getOrderStatus())
+			() -> assertNotNull(updatedOrder),
+			() -> assertEquals(1L, updatedOrder.getId()),
+			() -> assertEquals(1L, updatedOrder.getUser().getId()),
+			() -> assertEquals(1L, updatedOrder.getShippingAddress().getId()),
+			() -> assertEquals(1L, updatedOrder.getBillingAddress().getId()),
+			() -> assertEquals(new BigDecimal("199.99"), updatedOrder.getTotalAmount()),
+			() -> assertEquals(OrderStatus.valueOf("PAID"), updatedOrder.getOrderStatus())
 		);
 	}
 
