@@ -15,9 +15,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.AddressNotFoundException;
 import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.OrderNotFoundException;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.AddressRepository;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.CartRepository;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.DiscountRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.ProductSkuRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.UserRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderAddressesDto;
@@ -38,6 +42,15 @@ public class OrderServiceImplTest {
 
 	@MockitoBean
 	private AddressRepository addressRepository;
+
+	@MockitoBean
+	private CartRepository cartRepository;
+
+	@MockitoBean
+	private ProductSkuRepository productSkuRepository;
+
+	@MockitoBean
+	private DiscountRepository discountRepository;
 
 	@Autowired
 	private OrderService orderService;	
@@ -226,8 +239,23 @@ public class OrderServiceImplTest {
 
 		UpdateOrderAddressesDto updateOrderAddresses = createOrderAddressUpdateRequest();
 		updateOrderAddresses.setOrderId(100L);
-		
+
 		assertThrows(OrderNotFoundException.class, () -> {
+			orderService.updateOrderAddresses(updateOrderAddresses);
+		});
+	}
+
+	@Test
+	void testUpdateOrderAddress_whenAddressDoesNotExist_thenThrowException() {
+		when(orderRepository.findById(1L)).thenReturn(createOrder001());
+		when(addressRepository.findById(200L)).thenReturn(Optional.empty());
+
+		UpdateOrderAddressesDto updateOrderAddresses = createOrderAddressUpdateRequest();
+		updateOrderAddresses.setOrderId(1L);
+		updateOrderAddresses.setShippingAddressId(200L);
+		updateOrderAddresses.setBillingAddressId(200L);
+
+		assertThrows(AddressNotFoundException.class, () -> {
 			orderService.updateOrderAddresses(updateOrderAddresses);
 		});
 	}
