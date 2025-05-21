@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Cart;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.CartItem;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
 import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.AddressNotFoundException;
@@ -30,6 +33,9 @@ import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.Up
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.OrderServiceImplTestData.*;
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.UserTestData.*;
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.AddressTestData.*;
+import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.CartTestData.*;
+import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.ProductSkuTestData.*;
+import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.DiscountTestData.*;
 
 @SpringBootTest
 public class OrderServiceImplTest {
@@ -195,9 +201,13 @@ public class OrderServiceImplTest {
 	}
 
     @Test
-	void testSave() {
+	void createOrderFromCart_whenUserAndAddressAndCartExist_thenCreateOrder() {
 		when(userRepository.findById(3L)).thenReturn(createUser003());
 		when(addressRepository.findById(3L)).thenReturn(createAddress003());
+		when(cartRepository.findByUserId(3L)).thenReturn(createCart003());
+		when(productSkuRepository.findById(5L)).thenReturn(createProductSku005());
+		when(discountRepository.findActiveDiscountByProductSkuId(5L, LocalDateTime.now())).thenReturn(createDiscount003());
+		doNothing().when(cartRepository).delete(createCart003().orElseThrow());
 		when(orderRepository.save(any())).thenReturn(createOrderCreationResponse());
 
 		OrderDto orderDto = createOrderDtoCreationRequest();
@@ -209,7 +219,7 @@ public class OrderServiceImplTest {
 			() -> assertEquals(3L, createdOrder.getUser().getId()),
 			() -> assertEquals(3L, createdOrder.getShippingAddress().getId()),
 			() -> assertEquals(3L, createdOrder.getBillingAddress().getId()),
-			() -> assertEquals(new BigDecimal("39.99"), createdOrder.getTotalAmount()),
+			() -> assertEquals(new BigDecimal("80"), createdOrder.getTotalAmount()),
 			() -> assertEquals(OrderStatus.valueOf("PENDING"), createdOrder.getOrderStatus())
 		);
 	}

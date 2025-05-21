@@ -8,6 +8,7 @@ import java.util.Optional;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Cart;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.User;
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.UserTestData.*;
+import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.CartItemTestData.*;
 
 public class CartTestData {
 
@@ -26,6 +27,10 @@ public class CartTestData {
 
         cart.setId(1L);
         cart.setUser(user);
+        cart.setItems(List.of(
+            createCartItem001().orElseThrow(),
+            createCartItem002().orElseThrow()
+        ));
         cart.setCreatedAt(Timestamp.from(Instant.now()));
         cart.setUpdatedAt(Timestamp.from(Instant.now()));
 
@@ -38,6 +43,10 @@ public class CartTestData {
 
         cart.setId(2L);
         cart.setUser(user);
+        cart.setItems(List.of(
+            createCartItem003().orElseThrow(),
+            createCartItem004().orElseThrow()
+        ));
         cart.setCreatedAt(Timestamp.from(Instant.now()));
         cart.setUpdatedAt(Timestamp.from(Instant.now()));
 
@@ -50,6 +59,7 @@ public class CartTestData {
 
         cart.setId(3L);
         cart.setUser(user);
+        // cart.setItems(List.of(createCartItem005().orElseThrow()));
         cart.setCreatedAt(Timestamp.from(Instant.now()));
         cart.setUpdatedAt(Timestamp.from(Instant.now()));
 

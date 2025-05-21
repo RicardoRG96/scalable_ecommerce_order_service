@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Address;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
+import com.ricardo.scalable.ecommerce.platform.libs_common.entities.OrderItem;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.User;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
@@ -15,7 +16,8 @@ import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.Up
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 
 import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.AddressTestData.*;
-import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.UserTestData.*; 
+import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.utils.UserTestData.*;
+import static com.ricardo.scalable.ecommerce.platform.order_service.services.testData.OrderItemServiceImplTestData.*;
 
 public class OrderServiceImplTestData {
 
@@ -183,13 +185,16 @@ public class OrderServiceImplTestData {
 		User user = createUser003().orElseThrow();
 		Address shippingAddress = createAddress003().orElseThrow();
 		Address billingAddress = createAddress003().orElseThrow();
+		OrderItem orderItem = createOrderItem008().orElseThrow();
+		orderItem.setOrder(order);
 
 		order.setId(6L);
 		order.setUser(user);
-		order.setTotalAmount(new BigDecimal("39.99"));
+		order.setTotalAmount(new BigDecimal("80"));
 		order.setOrderStatus(OrderStatus.valueOf("PENDING"));
 		order.setShippingAddress(shippingAddress);
 		order.setBillingAddress(billingAddress);
+		order.setItems(List.of(orderItem));
 		order.setCreatedAt(Timestamp.from(Instant.now()));
 		order.setUpdatedAt(Timestamp.from(Instant.now()));
 

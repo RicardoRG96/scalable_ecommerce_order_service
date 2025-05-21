@@ -161,6 +161,24 @@ public class OrderItemServiceImplTestData {
 		return Optional.of(orderItem);
 	}
 
+	public static Optional<OrderItem> createOrderItem008() {
+		OrderItem orderItem = new OrderItem();
+		Order order = createOrder003().orElseThrow();
+		ProductSku productSku = createProductSku005().orElseThrow();
+		Discount discount = createDiscount003().orElseThrow();
+
+		orderItem.setId(5L);
+		orderItem.setOrder(order);
+		orderItem.setProductSku(productSku);
+		orderItem.setQuantity(2);
+		orderItem.setUnitPrice(new BigDecimal(20));
+		orderItem.setDiscount(discount);
+		orderItem.setCreatedAt(Timestamp.from(Instant.now()));
+		orderItem.setUpdatedAt(Timestamp.from(Instant.now()));
+
+		return Optional.of(orderItem);
+	}
+
 	public static Optional<List<OrderItem>> createListOfOrderItemByOrderId1() {
 		OrderItem orderItem1 = createOrderItem001().orElseThrow();
 		OrderItem orderItem2 = createOrderItem002().orElseThrow();

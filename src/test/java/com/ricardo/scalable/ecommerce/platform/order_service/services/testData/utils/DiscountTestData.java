@@ -74,8 +74,8 @@ public class DiscountTestData {
         discount.setId(3L);
         discount.setDiscountType(DiscountType.AMOUNT);
         discount.setDiscountValue(5.00);
-        discount.setStartDate(Timestamp.valueOf(LocalDateTime.of(2025, 3, 5, 0, 0, 0)));
-        discount.setEndDate(Timestamp.valueOf(LocalDateTime.of(2025, 3, 20, 23, 59, 59)));
+        discount.setStartDate(Timestamp.valueOf(LocalDateTime.of(2025, 4, 5, 0, 0, 0)));
+        discount.setEndDate(Timestamp.valueOf(LocalDateTime.of(2025, 6, 20, 23, 59, 59)));
         discount.setIsActive(true);
         discount.setProductSkus(productSkus);
         discount.setCreatedAt(Timestamp.from(Instant.now()));

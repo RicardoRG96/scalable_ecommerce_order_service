@@ -24,7 +24,6 @@ import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.Insufficie
 import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.OrderNotFoundException;
 import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.UserNotFoundException;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.AddressRepository;
-import com.ricardo.scalable.ecommerce.platform.order_service.repositories.CartItemRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.CartRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.DiscountRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.OrderRepository;
@@ -50,9 +49,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private CartRepository cartRepository;
-
-    @Autowired
-    private CartItemRepository cartItemRepository;
 
     @Autowired
     private ProductSkuRepository productSkuRepository;
