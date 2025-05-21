@@ -19,6 +19,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderAddressesDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 
 @ActiveProfiles("test")
@@ -349,7 +350,7 @@ public class OrderControllerTest {
                         () -> assertNotNull(json),
                         () -> assertEquals(7L, json.path("id").asLong()),
                         () -> assertEquals(2L, json.path("user").path("id").asLong()),
-                        () -> assertEquals(69.99, json.path("totalAmount").asDouble()),
+                        () -> assertEquals(1249, json.path("totalAmount").asDouble()),
                         () -> assertEquals("PENDING", json.path("orderStatus").asText()),
                         () -> assertEquals(2L, json.path("shippingAddress").path("id").asLong()),
                         () -> assertEquals(2L, json.path("billingAddress").path("id").asLong())	
@@ -447,10 +448,10 @@ public class OrderControllerTest {
     @Test
 	@Order(23)
 	void testUpdateOrder() {
-		OrderDto requestBody = createOrderUpdateDto();
-		
+		UpdateOrderAddressesDto requestBody = createOrderUpdateAddressesDto();
+
 		client.put()
-			.uri("/7")
+			.uri("/addresses")
 			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(requestBody)
 			.exchange()
@@ -462,12 +463,12 @@ public class OrderControllerTest {
                     JsonNode json = objectMapper.readTree(res.getResponseBody());
                     assertAll(
                         () -> assertNotNull(json),
-                        () -> assertEquals(7L, json.path("id").asLong()),
-                        () -> assertEquals(2L, json.path("user").path("id").asLong()),
+                        () -> assertEquals(1L, json.path("id").asLong()),
+                        () -> assertEquals(1L, json.path("user").path("id").asLong()),
                         () -> assertEquals(89.99, json.path("totalAmount").asDouble()),
                         () -> assertEquals("PENDING", json.path("orderStatus").asText()),
-                        () -> assertEquals(2L, json.path("shippingAddress").path("id").asLong()),
-                        () -> assertEquals(2L, json.path("billingAddress").path("id").asLong())	
+                        () -> assertEquals(3L, json.path("shippingAddress").path("id").asLong()),
+                        () -> assertEquals(3L, json.path("billingAddress").path("id").asLong())	
                     );
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -477,12 +478,12 @@ public class OrderControllerTest {
 
 	@Test
 	@Order(24)
-	void testUpdateOrderWithNoUserId() {
-		OrderDto requestBody = createOrderUpdateDto();
-		requestBody.setUserId(null);
+	void testUpdateOrderWithNoOrderId() {
+		UpdateOrderAddressesDto requestBody = createOrderUpdateAddressesDto();
+		requestBody.setOrderId(null);
 		
 		client.put()
-			.uri("/1")
+			.uri("/addresses")
 			.contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
 			.exchange()
@@ -492,11 +493,11 @@ public class OrderControllerTest {
 	@Test
 	@Order(25)
 	void testUpdateOrderWithNoShippingAddressId() {
-		OrderDto requestBody = createOrderUpdateDto();
+		UpdateOrderAddressesDto requestBody = createOrderUpdateAddressesDto();
 		requestBody.setShippingAddressId(null);
 		
 		client.put()
-			.uri("/1")
+			.uri("/addresses")
 			.contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
 			.exchange()
@@ -506,11 +507,11 @@ public class OrderControllerTest {
 	@Test
 	@Order(26)
 	void testUpdateOrderWithNoBillingAddressId() {
-		OrderDto requestBody = createOrderUpdateDto();
+		UpdateOrderAddressesDto requestBody = createOrderUpdateAddressesDto();
 		requestBody.setBillingAddressId(null);
 		
 		client.put()
-			.uri("/1")
+			.uri("/addresses")
 			.contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
 			.exchange()
@@ -519,11 +520,12 @@ public class OrderControllerTest {
 
 	@Test
 	@Order(27)
-	void testUpdateOrderNotFound() {
-		OrderDto requestBody = createOrderUpdateDto();
+	void testUpdateOrderNotFoundOrderId() {
+		UpdateOrderAddressesDto requestBody = createOrderUpdateAddressesDto();
+		requestBody.setOrderId(999L);
 		
 		client.put()
-			.uri("/999")
+			.uri("/addresses")
 			.contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
 			.exchange()
@@ -532,12 +534,12 @@ public class OrderControllerTest {
 
 	@Test
 	@Order(28)
-	void testUpdateOrderNotFoundUserId() {
-		OrderDto requestBody = createOrderUpdateDto();
-		requestBody.setUserId(999L);
+	void testUpdateOrderNotFoundShippingAddressId() {
+		UpdateOrderAddressesDto requestBody = createOrderUpdateAddressesDto();
+		requestBody.setShippingAddressId(999L);
 		
 		client.put()
-			.uri("/1")
+			.uri("/addresses")
 			.contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
 			.exchange()
@@ -546,12 +548,12 @@ public class OrderControllerTest {
 
 	@Test
 	@Order(29)
-	void testUpdateOrderNotFoundShippingAddressId() {
-		OrderDto requestBody = createOrderUpdateDto();
-		requestBody.setShippingAddressId(999L);
+	void testUpdateOrderNotFoundBillingAddressId() {
+		UpdateOrderAddressesDto requestBody = createOrderUpdateAddressesDto();
+		requestBody.setBillingAddressId(999L);
 		
 		client.put()
-			.uri("/1")
+			.uri("/addresses")
 			.contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
 			.exchange()
@@ -560,20 +562,6 @@ public class OrderControllerTest {
 
 	@Test
 	@Order(30)
-	void testUpdateOrderNotFoundBillingAddressId() {
-		OrderDto requestBody = createOrderUpdateDto();
-		requestBody.setBillingAddressId(999L);
-		
-		client.put()
-			.uri("/1")
-			.contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(requestBody)
-			.exchange()
-			.expectStatus().isNotFound();
-	}
-
-	@Test
-	@Order(31)
 	void testUpdateOrderStatus() {
 		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
 		
@@ -604,7 +592,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(32)
+	@Order(31)
 	void testUpdateOrderStatusWithNoOrderId() {
 		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
 		requestBody.setOrderId(null);
@@ -618,7 +606,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(33)
+	@Order(32)
 	void testUpdateOrderStatusWithNoOrderStatus() {
 		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
 		requestBody.setOrderStatus(null);
@@ -632,7 +620,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(34)
+	@Order(33)
 	void testUpdateOrderStatusNotFound() {
 		UpdateOrderStatusDto requestBody = createUpdateOrderStatusDto();
 		requestBody.setOrderId(999L);
@@ -646,7 +634,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@Order(35)
+	@Order(34)
 	void testDeleteOrder() {	
 		client.delete()
 			.uri("/7")
@@ -674,7 +662,7 @@ public class OrderControllerTest {
 	}
 	
 	@Test
-	@Order(36)
+	@Order(35)
 	void testGetDeletedOrder() {	
 		client.get()
 			.uri("/7")

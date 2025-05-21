@@ -178,13 +178,13 @@ INSERT INTO product_skus (product_id, size_attribute_id, color_attribute_id, sku
 -- DISCOUNTS
 
 INSERT INTO discounts (discount_type, discount_value, start_date, end_date, is_active)
-    VALUES ('fixed_amount', 10.00, '2025-03-01 00:00:00', '2025-03-31 23:59:59', TRUE);
+    VALUES ('amount', 10.00, '2025-03-01 00:00:00', '2025-03-31 23:59:59', TRUE);
 
 INSERT INTO discounts (discount_type, discount_value, start_date, end_date, is_active)
-    VALUES ('free_shipping', 5.00, '2025-03-10 00:00:00', '2025-04-15 23:59:59', TRUE);
+    VALUES ('amount', 5.00, '2025-03-10 00:00:00', '2025-04-15 23:59:59', TRUE);
 
 INSERT INTO discounts (discount_type, discount_value, start_date, end_date, is_active)
-    VALUES ('percentage', 20.00, '2025-03-03 00:00:00', '2025-03-31 23:59:59', TRUE);
+    VALUES ('percentage', 20.00, '2025-05-03 00:00:00', '2025-07-31 23:59:59', TRUE);
 
 INSERT INTO discounts (discount_type, discount_value, start_date, end_date, is_active)
     VALUES ('percentage', 10.00, '2025-02-01 00:00:00', '2025-02-28 23:59:59', TRUE);
@@ -202,10 +202,10 @@ INSERT INTO discount_product_sku (discount_id, product_sku_id)
     VALUES (2, 1);
 
 INSERT INTO discount_product_sku (discount_id, product_sku_id)
-    VALUES (3, 2);
+    VALUES (3, 1);
 
 INSERT INTO discount_product_sku (discount_id, product_sku_id)
-    VALUES (4, 3);
+    VALUES (3, 4);
 
 INSERT INTO discount_product_sku (discount_id, product_sku_id)
     VALUES (2, 3);
@@ -263,3 +263,30 @@ INSERT INTO order_items (order_id, product_sku_id, quantity, unit_price, discoun
 
 INSERT INTO order_items (order_id, product_sku_id, quantity, unit_price, discount_id)
     VALUES (6, 4, 2, 29.99, 1);
+
+
+-- CART
+
+INSERT INTO cart (user_id)
+    VALUES (1);
+
+INSERT INTO cart (user_id)
+    VALUES (2);
+
+
+-- CART ITEMS
+
+INSERT INTO cart_items (cart_id, product_sku_id, quantity)
+    VALUES (1, 1, 1);
+
+INSERT INTO cart_items (cart_id, product_sku_id, quantity)
+    VALUES (1, 2, 2);
+
+INSERT INTO cart_items (cart_id, product_sku_id, quantity)
+    VALUES (1, 3, 1);
+
+INSERT INTO cart_items (cart_id, product_sku_id, quantity)
+    VALUES (2, 4, 2);
+
+INSERT INTO cart_items (cart_id, product_sku_id, quantity)
+    VALUES (2, 1, 1);

@@ -1,6 +1,7 @@
 package com.ricardo.scalable.ecommerce.platform.order_service.services.testData;
 
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.OrderDto;
+import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderAddressesDto;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.dto.UpdateOrderStatusDto;
 
 public class OrderControllerTestData {
@@ -14,13 +15,13 @@ public class OrderControllerTestData {
 		return orderDto;
 	}
 
-	public static OrderDto createOrderUpdateDto() {
-		OrderDto orderDto = new OrderDto();
-		orderDto.setUserId(2L);
-		orderDto.setShippingAddressId(2L);
-		orderDto.setBillingAddressId(2L);
+	public static UpdateOrderAddressesDto createOrderUpdateAddressesDto() {
+		UpdateOrderAddressesDto updateOrderAddressesDto = new UpdateOrderAddressesDto();
+		updateOrderAddressesDto.setOrderId(1L);
+		updateOrderAddressesDto.setShippingAddressId(3L);
+		updateOrderAddressesDto.setBillingAddressId(3L);
 
-		return orderDto;
+		return updateOrderAddressesDto;
 	}
 
 	public static UpdateOrderStatusDto createUpdateOrderStatusDto() {

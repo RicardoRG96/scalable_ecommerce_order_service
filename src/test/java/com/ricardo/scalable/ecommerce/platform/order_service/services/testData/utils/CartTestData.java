@@ -59,7 +59,6 @@ public class CartTestData {
 
         cart.setId(3L);
         cart.setUser(user);
-        // cart.setItems(List.of(createCartItem005().orElseThrow()));
         cart.setCreatedAt(Timestamp.from(Instant.now()));
         cart.setUpdatedAt(Timestamp.from(Instant.now()));
 

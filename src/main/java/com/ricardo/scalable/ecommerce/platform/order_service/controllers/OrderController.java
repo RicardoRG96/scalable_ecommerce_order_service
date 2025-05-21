@@ -119,10 +119,9 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/addresses")
     public ResponseEntity<?> updateOrderAddress(
         @Valid @RequestBody UpdateOrderAddressesDto orderAddressDto,
-        @PathVariable Long id,
         BindingResult result
     ) {
         if (result.hasErrors()) {
