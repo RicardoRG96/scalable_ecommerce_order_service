@@ -14,12 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Cart;
-import com.ricardo.scalable.ecommerce.platform.libs_common.entities.CartItem;
 import com.ricardo.scalable.ecommerce.platform.libs_common.entities.Order;
 import com.ricardo.scalable.ecommerce.platform.libs_common.enums.OrderStatus;
 import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.AddressNotFoundException;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.CartNotFoundException;
 import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.OrderNotFoundException;
+import com.ricardo.scalable.ecommerce.platform.libs_common.exceptions.UserNotFoundException;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.AddressRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.CartRepository;
 import com.ricardo.scalable.ecommerce.platform.order_service.repositories.DiscountRepository;
@@ -222,6 +222,49 @@ public class OrderServiceImplTest {
 			() -> assertEquals(new BigDecimal("80"), createdOrder.getTotalAmount()),
 			() -> assertEquals(OrderStatus.valueOf("PENDING"), createdOrder.getOrderStatus())
 		);
+	}
+
+	@Test
+	void createOrderFromCart_whenUserDoNotExist_thenThrowException() {
+		when(userRepository.findById(100L)).thenReturn(Optional.empty());
+
+		OrderDto orderDto = createOrderDtoCreationRequest();
+		orderDto.setUserId(100L);
+
+		assertThrows(UserNotFoundException.class, () -> {
+			orderService.createOrderFromCart(orderDto);
+		});
+	}
+
+	@Test
+	void createOrderFromCart_whenAddressesDoNotExist_thenThrowException() {
+		when(userRepository.findById(3L)).thenReturn(createUser003());
+		when(addressRepository.findById(100L)).thenReturn(Optional.empty());
+
+		OrderDto orderDto = createOrderDtoCreationRequest();
+		orderDto.setUserId(3L);
+		orderDto.setShippingAddressId(100L);
+		orderDto.setBillingAddressId(100L);
+
+		assertThrows(AddressNotFoundException.class, () -> {
+			orderService.createOrderFromCart(orderDto);
+		});
+	}
+
+	@Test
+	void createOrderFromCart_whenCartDoNotExist_thenThrowException() {
+		when(userRepository.findById(3L)).thenReturn(createUser003());
+		when(addressRepository.findById(3L)).thenReturn(createAddress003());
+		when(cartRepository.findByUserId(3L)).thenReturn(Optional.empty());
+
+		OrderDto orderDto = createOrderDtoCreationRequest();
+		orderDto.setUserId(3L);
+		orderDto.setShippingAddressId(3L);
+		orderDto.setBillingAddressId(3L);
+
+		assertThrows(CartNotFoundException.class, () -> {
+			orderService.createOrderFromCart(orderDto);
+		});
 	}
 
 	@Test
